@@ -1,0 +1,51 @@
+@startuml TechNova
+title Cas d'utilisation enrichi - TechNova Marketplace (Version 2)
+
+left to right direction
+top to bottom direction
+
+actor "Client" as Client
+actor "Vendeur" as Vendeur
+actor "Administrateur" as Admin
+
+' ==== Cas du Client ====
+(Client) --> (Créer un compte)
+(Client) --> (Se connecter)
+(Client) --> (Consulter le catalogue)
+(Client) --> (Ajouter au panier)
+(Client) --> (Passer commande)
+(Client) --> (Payer la commande)
+(Client) --> (Suivre sa commande)
+(Client) --> (Laisser un avis produit)
+(Client) --> (Gérer son profil)
+(Client) --> (Contacter un vendeur)
+
+(Passer commande) ..> (Payer la commande) : <<include>>
+(Passer commande) ..> (Se connecter) : <<extend>>
+
+' ==== Cas du Vendeur ====
+(Vendeur) --> (Créer sa boutique)
+(Vendeur) --> (Gérer ses produits)
+(Vendeur) --> (Consulter ses commandes)
+(Vendeur) --> (Recevoir notifications de stock)
+(Vendeur) --> (Répondre aux messages clients)
+(Vendeur) --> (Modifier les infos boutique)
+(Vendeur) --> (Mettre des produits à la une)
+
+(Gérer ses produits) ..> (Créer un produit) : <<include>>
+(Gérer ses produits) ..> (Modifier un produit) : <<include>>
+(Gérer ses produits) ..> (Supprimer un produit) : <<include>>
+
+' ==== Cas de l’Administrateur ====
+(Admin) --> (Gérer les utilisateurs)
+(Admin) --> (Valider les boutiques)
+(Admin) --> (Modérer les produits)
+(Admin) --> (Gérer les commandes globales)
+(Admin) --> (Suspendre une boutique)
+(Admin) --> (Suspendre un produit)
+(Admin) --> (Suspendre une commande)
+(Admin) --> (Gérer le contenu du blog)
+(Admin) --> (Superviser les statistiques)
+(Admin) --> (Définir les produits à la une)
+
+@enduml

@@ -18,3 +18,8 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+
+###< symfony/secrets-bundle ###
+/config/secrets/dev/dev.decrypt.private.php
+/config/secrets/test/test.decrypt.private.php
+###< symfony/secrets-bundle ###

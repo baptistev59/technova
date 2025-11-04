@@ -1,0 +1,234 @@
+@startuml TechNova
+title Modèle Conceptuel de Données - TechNova Marketplace (Version étendue V2)
+
+' === Utilisateurs et rôles ===
+entity User {
+  *id : INT
+  email : VARCHAR
+  password : VARCHAR
+  roles : JSON
+  first_name : VARCHAR
+  last_name : VARCHAR
+  created_at : DATETIME
+}
+
+entity Vendor {
+  *id : INT
+  company_name : VARCHAR
+  siret : VARCHAR
+  phone : VARCHAR
+  user_id : FK
+}
+
+entity Shop {
+  *id : INT
+  name : VARCHAR
+  slug : VARCHAR
+  description : TEXT
+  status : VARCHAR
+  logo : VARCHAR
+  banner : VARCHAR
+  contact_email : VARCHAR
+  policies : TEXT
+  vendor_id : FK
+  created_at : DATETIME
+}
+
+' === Catalogue produits ===
+entity Category {
+  *id : INT
+  name : VARCHAR
+  slug : VARCHAR
+  parent_id : INT
+}
+
+entity Brand {
+  *id : INT
+  name : VARCHAR
+  slug : VARCHAR
+}
+
+entity Tag {
+  *id : INT
+  name : VARCHAR
+  slug : VARCHAR
+}
+
+entity Product {
+  *id : INT
+  name : VARCHAR
+  slug : VARCHAR
+  description : TEXT
+  short_description : TEXT
+  price : DECIMAL
+  stock : INT
+  barcode : VARCHAR
+  type : VARCHAR
+  status : VARCHAR
+  is_featured : BOOLEAN
+  shop_id : FK
+  brand_id : FK
+  category_id : FK
+  created_at : DATETIME
+  updated_at : DATETIME
+}
+
+entity ProductImage {
+  *id : INT
+  product_id : FK
+  url : VARCHAR
+  alt_text : VARCHAR
+  title : VARCHAR
+  caption : TEXT
+  position : INT
+  is_main : BOOLEAN
+  file_size : INT
+  mime_type : VARCHAR
+  created_at : DATETIME
+}
+
+entity ProductReview {
+  *id : INT
+  product_id : FK
+  user_id : FK
+  rating : INT
+  comment : TEXT
+  created_at : DATETIME
+}
+
+entity ProductTag {
+  *product_id : FK
+  *tag_id : FK
+}
+
+' === Panier et commandes ===
+entity Cart {
+  *id : INT
+  user_id : FK
+  status : VARCHAR
+  created_at : DATETIME
+}
+
+entity CartItem {
+  *id : INT
+  cart_id : FK
+  product_id : FK
+  quantity : INT
+  unit_price : DECIMAL
+}
+
+entity Order {
+  *id : INT
+  order_number : VARCHAR
+  user_id : FK
+  shop_id : FK
+  total : DECIMAL
+  status : VARCHAR
+  created_at : DATETIME
+}
+
+entity OrderItem {
+  *id : INT
+  order_id : FK
+  product_id : FK
+  label : VARCHAR
+  quantity : INT
+  unit_price : DECIMAL
+}
+
+entity Payment {
+  *id : INT
+  order_id : FK
+  method : VARCHAR
+  status : VARCHAR
+  transaction_id : VARCHAR
+}
+
+' === Adresses et souhaits ===
+entity Address {
+  *id : INT
+  user_id : FK
+  label : VARCHAR
+  street : VARCHAR
+  city : VARCHAR
+  postal_code : VARCHAR
+  country : VARCHAR
+}
+
+entity Wishlist {
+  *id : INT
+  user_id : FK
+  created_at : DATETIME
+}
+
+entity WishlistItem {
+  *id : INT
+  wishlist_id : FK
+  product_id : FK
+}
+
+' === Contenus et médias ===
+entity Media {
+  *id : INT
+  file_path : VARCHAR
+  alt : VARCHAR
+  title : VARCHAR
+  keywords : VARCHAR
+}
+
+entity ProductMedia {
+  *product_id : FK
+  *media_id : FK
+}
+
+entity Post {
+  *id : INT
+  title : VARCHAR
+  slug : VARCHAR
+  content : TEXT
+  created_at : DATETIME
+}
+
+entity PostMedia {
+  *post_id : FK
+  *media_id : FK
+}
+
+' === Messagerie ===
+entity Message {
+  *id : INT
+  sender_id : FK
+  receiver_id : FK
+  content : TEXT
+  created_at : DATETIME
+  read_at : DATETIME
+}
+
+' === Relations principales ===
+User ||--o{ Vendor : "possède"
+Vendor ||--o{ Shop : "gère"
+Shop ||--o{ Product : "contient"
+Category ||--o{ Product : "catégorise"
+Brand ||--o{ Product : "marque"
+Product ||--o{ ProductImage : "illustré par"
+Product ||--o{ ProductReview : "évalué par"
+Product ||--o{ ProductTag : "tagué"
+Tag ||--o{ ProductTag : "lié à"
+User ||--o{ Cart : "possède"
+Cart ||--o{ CartItem : "contient"
+User ||--o{ Order : "passe"
+Order ||--o{ OrderItem : "compose"
+Order ||--o{ Payment : "est payé par"
+Shop ||--o{ Order : "reçoit"
+User ||--o{ Address : "enregistre"
+User ||--o{ Wishlist : "crée"
+Wishlist ||--o{ WishlistItem : "contient"
+Product ||--o{ WishlistItem : "appartient à"
+Media ||--o{ ProductMedia : "lié à"
+Product ||--o{ ProductMedia : "associe"
+Post ||--o{ PostMedia : "illustré par"
+Media ||--o{ PostMedia : "lié à"
+User ||--o{ Message : "émet"
+User ||--o{ Message : "reçoit"
+
+@enduml
