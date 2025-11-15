@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use app\Entity\Address;
+use App\Entity\Address;
 use App\Entity\Traits\Timestampable;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
