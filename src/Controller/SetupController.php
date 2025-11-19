@@ -27,29 +27,24 @@ class SetupController extends AbstractController
         EntityManagerInterface $em,
         UserPasswordHasherInterface $passwordHasher
     ): Response {
-        $output = "== START SETUP ==\n\n";
+        $output = "== SETUP START ==\n\n";
 
-        // ---------------------------
-        // 1) Exécuter les migrations
-        // ---------------------------
-        $output .= "== EXECUTING MIGRATIONS ==\n\n";
+        // ---- MIGRATIONS ----
+        $output .= "== RUNNING MIGRATIONS ==\n\n";
 
         $command = new MigrateCommand($this->migrationFactory);
+
         $input = new ArrayInput([
-            '--no-interaction' => true,
             '--allow-no-migration' => true
         ]);
-        $buffer = new BufferedOutput();
 
+        $buffer = new BufferedOutput();
         $command->run($input, $buffer);
 
-        $output .= $buffer->fetch() . "\n";
+        $output .= $buffer->fetch();
+        $output .= "\nMigrations completed.\n\n";
 
-        // ---------------------------
-        // 2) Créer l’utilisateur admin
-        // ---------------------------
-        $output .= "== CREATING ADMIN USER ==\n\n";
-
+        // ---- ADMIN USER ----
         $existing = $em->getRepository(User::class)->findOneBy([
             'email' => 'admin@test.com'
         ]);
@@ -61,8 +56,8 @@ class SetupController extends AbstractController
             $user->setLastname('TechNova');
             $user->setRoles(['ROLE_ADMIN']);
 
-            $hashedPassword = $passwordHasher->hashPassword($user, '123456');
-            $user->setPassword($hashedPassword);
+            $hashed = $passwordHasher->hashPassword($user, "123456");
+            $user->setPassword($hashed);
 
             $em->persist($user);
             $em->flush();
