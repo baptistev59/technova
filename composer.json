@@ -79,12 +79,12 @@
     },
     "scripts": {
         "auto-scripts": {
-            "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd",
-            "importmap:install": "symfony-cmd"
+            "cache:clear": "disabled",
+            "assets:install %PUBLIC_DIR%": "disabled",
+            "importmap:install": "disabled"
         },
         "post-install-cmd": [
-            "@auto-scripts"
+        "@php -r \"if (getenv('RENDER') !== 'true') { passthru('composer run auto-scripts'); }\""
         ],
         "post-update-cmd": [
             "@auto-scripts"
