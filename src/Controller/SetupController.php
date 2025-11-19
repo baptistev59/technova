@@ -26,7 +26,7 @@ class SetupController extends AbstractController
     ): Response {
         $output = "== SETUP START ==\n\n";
 
-        // ---- 1) EXÉCUTER LES MIGRATIONS SANS CONSOLE / STDIN ----
+        // ---- 1) EXÉCUTER LES MIGRATIONS ----
         $output .= "== RUNNING MIGRATIONS ==\n";
 
         try {
@@ -34,9 +34,13 @@ class SetupController extends AbstractController
             $planCalculator  = $this->migrationFactory->getMigrationPlanCalculator();
             $latestVersion   = $aliasResolver->resolveVersionAlias('latest');
             $plan            = $planCalculator->getPlanUntilVersion($latestVersion);
+
+            $config = new MigratorConfiguration();
+            $config->setDryRun(false);
+
             $migrator        = $this->migrationFactory->getMigrator();
 
-            $migrator->migrate($plan);
+            $migrator->migrate($plan, $config);
 
             $output .= "Migrations executed successfully.\n\n";
         } catch (\Throwable $e) {
