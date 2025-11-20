@@ -34,5 +34,10 @@ COPY docker/nginx.conf /etc/nginx/sites-enabled/default
 # Expose port Render expects (10000)
 EXPOSE 10000
 
+RUN echo "listen = 9000" >> /usr/local/etc/php-fpm.d/zz-render.conf
+RUN ls -R /var/www/html
+
+
 # Start PHP-FPM + Nginx
-CMD service nginx start && php-fpm
+# CMD service nginx start && php-fpm
+CMD ["bash", "-c", "php-fpm & nginx -g 'daemon off;'"]

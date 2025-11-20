@@ -25,7 +25,7 @@ class SetupController extends AbstractController
 
         try {
             // ----------------------------------------------------------
-            // 1) SYNC METADATA STORAGE
+            // SYNC METADATA STORAGE
             // ----------------------------------------------------------
             $output .= "== SYNC METADATA STORAGE ==\n";
 
@@ -34,7 +34,7 @@ class SetupController extends AbstractController
             $output .= "Metadata storage synced.\n\n";
 
             // ----------------------------------------------------------
-            // 2) EXÉCUTER LES MIGRATIONS
+            // EXÉCUTER LES MIGRATIONS
             // ----------------------------------------------------------
             $output .= "== RUNNING MIGRATIONS ==\n";
 
@@ -60,7 +60,7 @@ class SetupController extends AbstractController
         }
 
         // ----------------------------------------------------------
-        // 3) CRÉER L’UTILISATEUR ADMIN SI NON EXISTANT
+        // CRÉER L’UTILISATEUR ADMIN SI NON EXISTANT
         // ----------------------------------------------------------
         $output .= "== CREATING ADMIN USER ==\n";
 
