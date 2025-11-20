@@ -79,12 +79,12 @@
     },
     "scripts": {
         "auto-scripts": {
-            "cache:clear": "disabled",
-            "assets:install %PUBLIC_DIR%": "disabled",
-            "importmap:install": "disabled"
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd",
+            "importmap:install": "symfony-cmd"
         },
         "post-install-cmd": [
-        "@php -r \"if (getenv('RENDER') !== 'true') { passthru('composer run auto-scripts'); }\""
+            "@php -r \"if (getenv('RENDER') !== 'true') { passthru('composer run auto-scripts'); }\""
         ],
         "post-update-cmd": [
             "@auto-scripts"
@@ -104,7 +104,7 @@
         "symfony/browser-kit": "7.3.*",
         "symfony/css-selector": "7.3.*",
         "symfony/debug-bundle": "7.3.*",
-        "symfony/maker-bundle": "^1.0",
+        "symfony/maker-bundle": "*",
         "symfony/stopwatch": "7.3.*",
         "symfony/web-profiler-bundle": "7.3.*"
     }

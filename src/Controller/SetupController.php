@@ -7,23 +7,19 @@ use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class SetupController extends AbstractController
 {
-    private DependencyFactory $migrationFactory;
-
-    public function __construct(DependencyFactory $migrationFactory)
-    {
-        $this->migrationFactory = $migrationFactory;
-    }
-
     #[Route('/run-setup', name: 'run_setup')]
     public function setup(
         EntityManagerInterface $em,
-        UserPasswordHasherInterface $passwordHasher
+        UserPasswordHasherInterface $passwordHasher,
+        #[Autowire(service: 'doctrine.migrations.dependency_factory')]
+        DependencyFactory $migrationFactory
     ): Response {
         $output = "== SETUP START ==\n\n";
 
@@ -33,7 +29,7 @@ class SetupController extends AbstractController
             // ----------------------------------------------------------
             $output .= "== SYNC METADATA STORAGE ==\n";
 
-            $storage = $this->migrationFactory->getMetadataStorage();
+            $storage = $migrationFactory->getMetadataStorage();
             $storage->ensureInitialized();
             $output .= "Metadata storage synced.\n\n";
 
@@ -42,8 +38,8 @@ class SetupController extends AbstractController
             // ----------------------------------------------------------
             $output .= "== RUNNING MIGRATIONS ==\n";
 
-            $aliasResolver   = $this->migrationFactory->getVersionAliasResolver();
-            $planCalculator  = $this->migrationFactory->getMigrationPlanCalculator();
+            $aliasResolver   = $migrationFactory->getVersionAliasResolver();
+            $planCalculator  = $migrationFactory->getMigrationPlanCalculator();
             $latestVersion   = $aliasResolver->resolveVersionAlias('latest');
             $plan            = $planCalculator->getPlanUntilVersion($latestVersion);
 
@@ -51,7 +47,7 @@ class SetupController extends AbstractController
             $config->setDryRun(false);
             $config->setTimeAllQueries(true);
 
-            $migrator = $this->migrationFactory->getMigrator();
+            $migrator = $migrationFactory->getMigrator();
             $migrator->migrate($plan, $config);
 
             $output .= "Migrations executed successfully.\n\n";
