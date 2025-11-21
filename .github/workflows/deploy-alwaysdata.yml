@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -20,14 +21,16 @@ jobs:
           extensions: pdo_pgsql, intl
           coverage: none
 
-      - name: Install dependencies (no dev)
+      - name: Composer install (prod)
+        env:
+          ALWAYSDATA: true
         run: |
-          composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+          composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader --no-scripts
 
       - name: Sync files to AlwaysData via rsync
         uses: burnett01/rsync-deployments@7.1.0
         with:
-          switches: -az --delete --exclude=".github"
+          switches: -az --delete --exclude=".github" --exclude=".git"
           path: ./
           remote_path: ${{ secrets.DEPLOY_PATH }}
           remote_host: ${{ secrets.SSH_REMOTE_HOST }}
@@ -35,7 +38,7 @@ jobs:
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
           remote_port: ${{ secrets.SSH_REMOTE_PORT }}
 
-      - name: Run migrations & clear cache on AlwaysData
+      - name: Run migrations & clear/warmup cache on AlwaysData
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_REMOTE_HOST }}
@@ -43,6 +46,9 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_REMOTE_PORT }}
           script: |
+            export APP_ENV=prod
             cd ${{ secrets.DEPLOY_PATH }}
+            composer run auto-scripts
             php bin/console doctrine:migrations:migrate --no-interaction --env=prod || true
-            php bin/console cache:clear --env=prod
+            php bin/console cache:clear --env=prod --no-warmup
+            php bin/console cache:warmup --env=prod

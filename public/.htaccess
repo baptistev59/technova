@@ -1,0 +1,7 @@
+SetEnv APP_ENV "prod"
+SetEnv APP_DEBUG "0"
+SetEnv CORS_ALLOW_ORIGIN "*"
+SetEnv JWT_PASSPHRASE "Teqapexa59!"
+
+# BASE DE DONNEES POSTGRES ALWAYS DATA
+SetEnv DATABASE_URL "pgsql://baptistev59:Teqapexa59!@postgres-baptistev59.alwaysdata.net:5432/baptistev59_technova"

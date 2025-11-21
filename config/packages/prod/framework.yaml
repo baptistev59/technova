@@ -1,0 +1,6 @@
+framework:
+  router:
+    strict_requirements: null
+  http_method_override: false
+  session:
+    handler_id: null
