@@ -1,0 +1,47 @@
+name: Deploy TechNova backend to AlwaysData
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_pgsql, intl
+          coverage: none
+
+      - name: Install dependencies (no dev)
+        run: |
+          composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+
+      - name: Sync files to AlwaysData via rsync
+        uses: burnett01/rsync-deployments@v7
+        with:
+          switches: -az --delete --exclude=".github"
+          path: ./
+          remote_path: ${{ secrets.AD_TARGET_DIR }}
+          remote_host: ${{ secrets.AD_HOST }}
+          remote_user: ${{ secrets.AD_USER }}
+          remote_key: ${{ secrets.AD_SSH_KEY }}
+
+      - name: Run migrations & clear cache on AlwaysData
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.AD_HOST }}
+          username: ${{ secrets.AD_USER }}
+          key: ${{ secrets.AD_SSH_KEY }}
+          port: ${{ secrets.AD_PORT }}
+          script: |
+            cd ${{ secrets.AD_TARGET_DIR }}
+            php bin/console doctrine:migrations:migrate --no-interaction --env=prod || true
+            php bin/console cache:clear --env=prod
