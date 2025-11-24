@@ -133,3 +133,4 @@ Professionnel et extensible (ajout JWT, création auto de l’admin, config mail
  Étape optionnelle : vérification du JWT (clés privées/publiques)
 
  Étape optionnelle : génération automatique du Vendor par défaut
+```
