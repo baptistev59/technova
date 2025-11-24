@@ -1,0 +1,4 @@
+api_user_avatar:
+  path: /api/user/avatar
+  controller: App\Controller\Api\UserAvatarController::upload
+  methods: [POST]

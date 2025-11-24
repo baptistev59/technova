@@ -16,5 +16,13 @@ services:
     App\:
         resource: '../src/'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    # Doctrine Migrations DependencyFactory service
+    Doctrine\Migrations\DependencyFactory:
+        alias: 'doctrine.migrations.dependency_factory'
+        public: true
+
+    # InstallCommand service
+    App\Install\InstallCommand:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+        tags: ['console.command']

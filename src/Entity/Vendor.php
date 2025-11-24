@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\VendorRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Traits\Timestampable;
 
@@ -23,6 +24,8 @@ class Vendor
     private ?string $businessId = null;
 
     #[ORM\Column(length: 25, nullable: true)]
+    #[Assert\Length(min: 5)]
+    #[Assert\Regex(pattern: '/^[\d\+\-\s]+$/', message: "Le numéro ne doit contenir que des chiffres, espaces, tirets ou +.")]
     private ?string $phone = null;
 
     #[ORM\Column(length: 50, nullable: true)]
@@ -39,6 +42,18 @@ class Vendor
 
     #[ORM\OneToOne(mappedBy: 'vendor', cascade: ['persist', 'remove'])]
     private ?User $owner = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $slug = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $logo = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $banner = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $description = null;
 
     public function getId(): ?int
     {
@@ -147,6 +162,54 @@ class Vendor
         }
 
         $this->owner = $owner;
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(?string $slug): static
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
+    public function getLogo(): ?string
+    {
+        return $this->logo;
+    }
+
+    public function setLogo(?string $logo): static
+    {
+        $this->logo = $logo;
+
+        return $this;
+    }
+
+    public function getBanner(): ?string
+    {
+        return $this->banner;
+    }
+
+    public function setBanner(?string $banner): static
+    {
+        $this->banner = $banner;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
 
         return $this;
     }

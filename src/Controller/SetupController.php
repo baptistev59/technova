@@ -21,6 +21,12 @@ class SetupController extends AbstractController
         #[Autowire(service: 'doctrine.migrations.dependency_factory')]
         DependencyFactory $migrationFactory
     ): Response {
+
+        // 🔐 Protection environnement : seulement en DEV
+        if ($this->getParameter('kernel.environment') !== 'dev') {
+            return new Response('Setup disabled in production', 403);
+        }
+
         $output = "== SETUP START ==\n\n";
 
         try {

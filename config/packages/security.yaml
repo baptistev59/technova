@@ -17,7 +17,21 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        # 2) LOGIN JWT
+        # 2) FRONT TWIG (session)
+        main:
+            pattern: ^/
+            provider: app_user_provider
+            lazy: true
+            stateless: false
+            form_login:
+                login_path: login
+                check_path: login
+                enable_csrf: true
+            logout:
+                path: logout
+                target: /
+
+        # 3) LOGIN JWT
         login:
             pattern: ^/api/login
             stateless: true
@@ -29,7 +43,7 @@ security:
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
 
-        # 3) API PROTÉGÉE PAR JWT
+        # 4) API PROTÉGÉE PAR JWT
         api:
             pattern: ^/api
             stateless: true
@@ -37,5 +51,15 @@ security:
             jwt: ~
 
     access_control:
+        # TWIG PUBLIC
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
+
+        # API PUBLIC
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
+
+        # API PRIVÉ
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+
+        # TWIG ADMIN
+        - { path: ^/admin, roles: ROLE_ADMIN }
