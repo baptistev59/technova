@@ -1,8 +1,18 @@
-<IfModule mod_rewrite.c>
-    Options -MultiViews
-    RewriteEngine On
+RewriteEngine On
 
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^ index.php [L]
-</IfModule>
+# Laisser passer les vrais fichiers et dossiers
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Router tout vers Symfony
+
+RewriteRule ^ index.php [QSA,L]
+
+# Fix AlwaysData PHP-FPM
+
+<FilesMatch "\.php$">
+SetHandler proxy:unix:/home/baptistev59/.php-fpm.sock|fcgi://localhost
+</FilesMatch>
+
+Options -MultiViews
