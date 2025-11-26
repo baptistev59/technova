@@ -9,6 +9,8 @@
 
 TechNova intègre un **assistant d’installation complet**, permettant de configurer rapidement et proprement l’environnement du projet, aussi bien **en local** que sur un hébergement **AlwaysData / OVH / VPS**.
 
+---
+
 Le wizard gère automatiquement :
 ✔ la configuration PostgreSQL
 ✔ la création ou réinitialisation de la base
