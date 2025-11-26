@@ -8,6 +8,9 @@ use App\Install\Step\RunMigrationsStep;
 use App\Install\Step\SummaryStep;
 use App\Install\Step\TestDatabaseConnectionStep;
 use App\Install\Step\StepInterface;
+use App\Install\Step\RepairMigrationsStep;
+use App\Install\Step\CreateOrResetDatabaseStep;
+use App\Install\Step\CreateAdminStep;
 use App\Install\Util\DatabaseDsnParser;
 use App\Install\Util\EnvReader;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -16,6 +19,8 @@ use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Commande principali app:install (orchestrateur)
@@ -30,8 +35,11 @@ class InstallCommand extends Command
     /** @var StepInterface[] */
     private array $steps = [];
 
-    public function __construct(string $projectDir)
-    {
+    public function __construct( 
+        string $projectDir,
+        EntityManagerInterface $em,
+        UserPasswordHasherInterface $passwordHasher
+    ) {
         parent::__construct();
 
         $envReader = new EnvReader($projectDir);
@@ -40,8 +48,11 @@ class InstallCommand extends Command
         $this->steps = [
             new CheckEnvironmentStep(),
             new ConfigureDatabaseStep($envReader, $dsnParser),
+            new CreateOrResetDatabaseStep($envReader, $dsnParser),
             new TestDatabaseConnectionStep($envReader, $dsnParser),
+            new RepairMigrationsStep(),
             new RunMigrationsStep(),
+            new CreateAdminStep($em, $passwordHasher),
             new SummaryStep(),
         ];
     }

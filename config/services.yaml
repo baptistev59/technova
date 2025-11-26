@@ -25,4 +25,6 @@ services:
     App\Install\InstallCommand:
         arguments:
             $projectDir: '%kernel.project_dir%'
+            $em: '@doctrine.orm.entity_manager'
+            $passwordHasher: '@security.user_password_hasher'
         tags: ['console.command']

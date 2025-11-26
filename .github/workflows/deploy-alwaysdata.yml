@@ -3,37 +3,35 @@ name: Deploy TechNova backend to AlwaysData
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
+          php-version: '8.3'
           extensions: pdo_pgsql, intl
           coverage: none
 
-      - name: Composer install (prod)
-        env:
-          ALWAYSDATA: true
+      - name: Install Composer dependencies (prod)
         run: |
-          composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader --no-scripts
+          composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
 
-      - name: Sync files to AlwaysData via rsync
+      - name: Build Symfony cache locally (prod)
+        run: |
+          php bin/console cache:warmup --env=prod
+
+      - name: Deploy to AlwaysData via rsync
         uses: burnett01/rsync-deployments@7.1.0
         with:
-          switches: -az --delete --exclude=".github" --exclude=".git"
+          switches: -az --delete --exclude=".github" --exclude=".git" --exclude="tests"
           path: ./
           remote_path: ${{ secrets.DEPLOY_PATH }}
-          remote_host: ${{ secrets.SSH_REMOTE_HOST }}
-          remote_user: ${{ secrets.SSH_REMOTE_USER }}
-          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
-          remote_port: ${{ secrets.SSH_REMOTE_PORT }}
+          remote_host: ${{ secrets.SSH_REMOTE_HOST_
