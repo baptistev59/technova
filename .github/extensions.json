@@ -1,0 +1,16 @@
+{
+    "recommendations": [
+        "openai.codex",
+        "ms-vscode.vscode-ai",
+        "bmewburn.vscode-intelephense-client",
+        "Symfony.symfony-vscode",
+        "junstyle.php-cs-fixer",
+        "mblode.twig-language-2",
+        "redhat.vscode-yaml",
+        "ms-ossdata.vscode-postgresql",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "eamodio.gitlens",
+        "ms-vscode-remote.remote-wsl"
+    ]
+}

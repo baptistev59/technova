@@ -1,0 +1,33 @@
+{
+    "openai.codex.enableInlineChat": true,
+    "openai.codex.inlineChatContext": "fileAndSelection",
+    "openai.codex.panel.position": "right",
+    "openai.codex.enableCodeEdits": true,
+
+    "intelephense.format.enable": true,
+    "php.validate.executablePath": "/usr/bin/php",
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+    "yaml.schemas": {
+        "https://json.schemastore.org/composer": "/composer.json"
+    },
+
+    "files.associations": {
+        "*.twig": "twig",
+        "*.php": "php"
+    },
+
+    "gitlens.currentLine.enabled": false,
+    "workbench.editor.enablePreview": false,
+
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
+    ],
+
+    "prettier.useTabs": false,
+    "prettier.singleQuote": true
+}
