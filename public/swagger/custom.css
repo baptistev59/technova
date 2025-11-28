@@ -1,0 +1,25 @@
+/* Topbar */
+.swagger-ui .topbar {
+    background: #1E88E5 !important;
+}
+
+/* Section titles */
+.swagger-ui .opblock-tag {
+    font-size: 22px !important;
+    color: #1E88E5 !important;
+}
+
+/* Routes */
+.swagger-ui .opblock-summary {
+    border-left: 5px solid #1E88E5 !important;
+}
+
+/* Buttons */
+.swagger-ui .btn.execute {
+    background-color: #1E88E5 !important;
+}
+
+.swagger-ui .btn.try-out__btn {
+    border-color: #1E88E5 !important;
+    color: #1E88E5 !important;
+}

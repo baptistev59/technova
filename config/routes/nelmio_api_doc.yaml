@@ -1,0 +1,27 @@
+# config/routes/nelmio_api_doc.yaml
+
+# UI Swagger
+app.swagger_ui:
+    path: /api/docs
+    methods: GET
+    defaults:
+        _controller: nelmio_api_doc.controller.swagger_ui
+        area: default
+
+# JSON/YAML
+app.swagger_json:
+    path: /api/docs.{_format}
+    methods: GET
+    defaults:
+        _controller: nelmio_api_doc.controller.swagger
+        area: default
+        _format: json
+    requirements:
+        _format: json|yaml
+
+nelmio_api_doc_json:
+    path: /api/docs.json
+    controller: Nelmio\ApiDocBundle\Controller\DocumentationController
+    defaults:
+        _format: json
+        area: default

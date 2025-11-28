@@ -7,17 +7,18 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\QuestionHelper;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[AsCommand(
     name: 'app:create-admin',
-    description: 'Crée un utilisateur administrateur',
+    description: 'Crée un utilisateur administrateur (mode interactif)',
 )]
-
 class CreateAdminCommand extends Command
 {
-    
     public function __construct(
         private EntityManagerInterface $em,
         private UserPasswordHasherInterface $passwordHasher
@@ -27,21 +28,71 @@ class CreateAdminCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $email = "admin@test.com";
-        $password = "123456";
+        /** @var QuestionHelper $helper */
+        $helper = $this->getHelper('question');
+
+        // -------------------------
+        // EMAIL
+        // -------------------------
+        $emailQuestion = new Question("Email de l'admin : ");
+        $email = $helper->ask($input, $output, $emailQuestion);
+
+        if (!$email) {
+            $output->writeln("<error>L'email est obligatoire.</error>");
+            return Command::FAILURE;
+        }
 
         $existing = $this->em->getRepository(User::class)->findOneBy(['email' => $email]);
 
         if ($existing) {
-            $output->writeln("<comment>L'utilisateur existe déjà.</comment>");
-            return Command::SUCCESS;
+            $output->writeln("<comment>Un utilisateur avec cet email existe déjà.</comment>");
+            $confirm = new ConfirmationQuestion("Voulez-vous l'écraser ? (yes/no) ", false);
+
+            if (!$helper->ask($input, $output, $confirm)) {
+                $output->writeln("<info>Opération annulée.</info>");
+                return Command::SUCCESS;
+            }
         }
 
-        $user = new User();
+        // -------------------------
+        // MOT DE PASSE
+        // -------------------------
+        $passwordQuestion = new Question("Mot de passe admin : ");
+        $passwordQuestion->setHidden(true);
+        $passwordQuestion->setHiddenFallback(false);
+
+        $password = $helper->ask($input, $output, $passwordQuestion);
+
+        if (!$password) {
+            $output->writeln("<error>Le mot de passe est obligatoire.</error>");
+            return Command::FAILURE;
+        }
+
+        // -------------------------
+        // PRENOM
+        // -------------------------
+        $firstnameQuestion = new Question("Prénom (default: Admin) : ", "Admin");
+        $firstname = $helper->ask($input, $output, $firstnameQuestion);
+
+        // -------------------------
+        // NOM
+        // -------------------------
+        $lastnameQuestion = new Question("Nom (default: TechNova) : ", "TechNova");
+        $lastname = $helper->ask($input, $output, $lastnameQuestion);
+
+        // -------------------------
+        // CREATION OU UPDATE
+        // -------------------------
+        if (!$existing) {
+            $user = new User();
+        } else {
+            $user = $existing;
+        }
+
         $user->setEmail($email);
-        $user->setFirstname("Admin");
-        $user->setLastname("TechNova");
-        $user->setRoles(["ROLE_ADMIN"]);
+        $user->setFirstname($firstname);
+        $user->setLastname($lastname);
+        $user->setRoles(['ROLE_ADMIN']);
 
         $hash = $this->passwordHasher->hashPassword($user, $password);
         $user->setPassword($hash);
@@ -49,7 +100,8 @@ class CreateAdminCommand extends Command
         $this->em->persist($user);
         $this->em->flush();
 
-        $output->writeln("<info>Utilisateur admin créé avec succès.</info>");
+        $output->writeln("<info>Utilisateur administrateur créé / mis à jour avec succès.</info>");
+
         return Command::SUCCESS;
     }
 }

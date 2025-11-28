@@ -1,0 +1,16 @@
+# config/packages/nelmio_api_doc.yaml
+nelmio_api_doc:
+    documentation:
+        info:
+            title: "TechNova Marketplace — API"
+            description: >
+                Documentation officielle de l'API TechNova.
+                Utilisez /api/login pour obtenir un JWT et tester les endpoints protégés.
+            version: "1.0.0"
+
+    areas:
+        default:
+            # On documente toutes les routes qui commencent par /api,
+            # mais on exclut la doc elle-même pour éviter de la voir dans la doc.
+            path_patterns:
+                - ^/api(?!/docs)

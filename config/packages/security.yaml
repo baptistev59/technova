@@ -12,12 +12,17 @@ security:
 
     firewalls:
 
-        # 1) DEV: désactivé
+        # 0) Swagger / OpenAPI — PAS DE JWT
+        docs:
+            pattern: ^/api/docs
+            security: false
+
+        # 1) Profiler / assets — PAS DE SÉCURITÉ
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        # 2) LOGIN JWT
+        # 2) Login JWT
         login:
             pattern: ^/api/login
             stateless: true
@@ -29,7 +34,7 @@ security:
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
 
-        # 3) API PROTÉGÉE PAR JWT
+        # 3) API protégée par JWT
         api:
             pattern: ^/api
             stateless: true
@@ -37,5 +42,12 @@ security:
             jwt: ~
 
     access_control:
+
+        # Swagger / OpenAPI → public
+        - { path: ^/api/docs, roles: PUBLIC_ACCESS }
+
+        # Login JWT → public
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
+
+        # Le reste de l'API nécessite un JWT
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }

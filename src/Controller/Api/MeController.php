@@ -8,8 +8,12 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use OpenApi\Annotations as OA;
 
-
+/**
+ * @Route("/api/me", methods={"GET"})
+ * @OA\Tag(name="System")
+ */
 final class MeController extends AbstractController
 {
     #[Route('/api/me', name: 'api_me', methods: ['GET'])]
