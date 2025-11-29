@@ -32,15 +32,17 @@ php bin/console app:create-admin --env=prod
 ```
 
 ## 4. Incidents rencontrés & résolutions
-| Date | Commande | Symptôme | Résolution |
-|------|----------|----------|------------|
-| 29/11 | `composer install --no-dev --optimize-autoloader` | `Environment variable not found: "DEFAULT_URI"` et warning Doctrine `report_fields_where_declared` | Ajouter `DEFAULT_URI` dans les variables Alwaysdata (par ex. `https://technova.alwaysdata.net`). Relancer `composer install` (le warning Doctrine est informatif tant qu’on reste sur DoctrineBundle 2.x). |
-| 29/11 | `php bin/console lexik:jwt:generate-keypair` | `Your keys already exist` | Supprimer les anciens fichiers dans `/home/technova/www/technova-backend/config/jwt/` ou relancer la commande avec `--overwrite` pour générer une nouvelle paire. S’assurer que le dossier est inscriptible par PHP. |
+| Date | Commande | Symptôme | Résolution / Statut |
+|------|----------|----------|---------------------|
+| 29/11 | `composer install --no-dev --optimize-autoloader` | `Environment variable not found: "DEFAULT_URI"` + warning Doctrine `report_fields_where_declared` | Ajouter `DEFAULT_URI` dans les variables Alwaysdata (ex. `https://technova.alwaysdata.net`). Warning Doctrine simplement informatif. **À faire** tant que la variable n’est pas créée. |
+| 29/11 | `php bin/console lexik:jwt:generate-keypair` puis `--overwrite` | Message “Your keys already exist” lors de la première tentative | Résolu : exécution avec `--overwrite` a généré une nouvelle paire de clés sur Alwaysdata. |
+| 29/11 | `php bin/console doctrine:migrations:migrate --env=prod` | `The version "latest" couldn't be reached, there are no registered migrations.` | À investiguer après résolution de `DEFAULT_URI`. Vérifier que les fichiers du dossier `migrations/` sont bien déployés sur Alwaysdata (git pull), puis relancer la commande. |
 
 ## 5. Prochaines actions
-- Après ajout de `DEFAULT_URI`, relancer `composer install --no-dev --optimize-autoloader`.
-- Générer les clés JWT avec `php bin/console lexik:jwt:generate-keypair --overwrite`.
-- Exécuter les migrations et créer un admin (`app:create-admin`) une fois les clés prêtes.
-- Tester `/api/test` et `/api/docs` depuis `https://technova.alwaysdata.net`.
+1. **Variables** : déclarer `DEFAULT_URI=https://technova.alwaysdata.net` dans Alwaysdata, vérifier les valeurs d’`APP_SECRET` et `JWT_PASSPHRASE`.
+2. **Installation** : relancer `composer install --no-dev --optimize-autoloader` (devrait passer une fois la variable ajoutée).
+3. **Migrations** : le dossier `~/www/technova-backend/migrations/` est vide sur Alwaysdata (voir commande `ls migrations/`). Vérifier que les fichiers sont bien suivis en Git localement puis pousser/puller depuis le serveur (`git pull origin master`). Une fois les fichiers présents, exécuter `php bin/console doctrine:migrations:migrate --no-interaction --env=prod`.
+4. **Provisioning** : lancer `php bin/console app:create-admin --env=prod`.
+5. **Tests** : valider `/api/test` et `/api/docs` sur `https://technova.alwaysdata.net` (protéger Swagger si nécessaire).
 
 > Pense à enrichir ce fichier dès que tu réalises une nouvelle opération (tests, corrections, incidents). Ce sera ta trace pour la soutenance.
