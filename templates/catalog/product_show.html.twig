@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ product.name }} | TechNova{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-md-6">
+        {% set mainImage = product.images|first %}
+        {% if mainImage %}
+            <img src="{{ mainImage.url }}" class="img-fluid mb-3" alt="{{ mainImage.alt }}">
+        {% endif %}
+        <div class="row g-2">
+            {% for image in product.images %}
+            <div class="col-4">
+                <img src="{{ image.url }}" class="img-fluid" alt="{{ image.alt }}">
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <h1>{{ product.name }}</h1>
+        <p class="text-muted">{{ product.brand ? product.brand.name ~ ' · ' : '' }}{{ product.category.name }}</p>
+        <p class="lead">{{ product.price|number_format(2, ',', ' ') }} €</p>
+        <p>{{ product.description }}</p>
+        <p><strong>Stock :</strong> {{ product.stock > 0 ? product.stock ~ ' disponibles' : 'Rupture' }}</p>
+        <a class="btn btn-primary" href="#">Ajouter au panier</a>
+    </div>
+</div>
+
+<section class="mt-5">
+    <h2 class="h5">Avis clients</h2>
+    {% if product.reviews|length > 0 %}
+        {% for review in product.reviews %}
+            <div class="border rounded p-3 mb-3">
+                <strong>Note :</strong> {{ review.rating }}/5<br>
+                <p class="mb-0">{{ review.comment }}</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>Aucun avis pour le moment.</p>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil | TechNova{% endblock %}
+
+{% block body %}
+<div class="text-center mb-5">
+    <h1 class="display-5">TechNova Marketplace</h1>
+    <p class="lead">Vos produits tech favoris et objets connectés, sélectionnés par notre boutique.</p>
+    <a class="btn btn-primary" href="{{ path('catalog_index') }}">Découvrir le catalogue</a>
+</div>
+
+<h2 class="h4 mb-4">Produits récents</h2>
+<div class="row g-4">
+    {% for product in products %}
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                {% set mainImage = product.images|first %}
+                {% if mainImage %}
+                    <img src="{{ mainImage.url }}" class="card-img-top" alt="{{ mainImage.alt }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text">{{ product.shortDescription }}</p>
+                    <p class="fw-bold">{{ product.price|number_format(2, ',', ' ') }} €</p>
+                    <a href="{{ path('product_show', {slug: product.slug}) }}" class="btn btn-outline-primary">Voir le produit</a>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <p>Aucun produit récent n'est disponible.</p>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -7,10 +7,14 @@
 - ProductImage: child of Product, order/position/isMain, metadata
 - ProductReview: rating/comment authored by User for Product
 
-Repositories created for each entity, with ProductRepository featuring `findLatestPublished()`.
+Repositories created for each entity, with ProductRepository featuring `findLatestPublished()` and `filterBy()`.
 
-Next steps:
-1. Run migrations (`php bin/console make:migration` & `doctrine:migrations:migrate`).
-2. Add fixtures for categories, brands, shops, products.
-3. Implement Twig views (`/`, `/catalogue`, `/produit/{slug}`) and API counterparts.
-4. Test endpoints via Postman.
+Fixtures (`php bin/console doctrine:fixtures:load --purge-with-truncate`) inject:
+- Admin `admin@test.fr` (password `123456`)
+- Un vendor + boutique
+- Catégories : Informatique / Smartphones & Tablettes / Maison connectée
+- Marques : NovaTech / UrbanGears / HomeSense
+- Produits de démo avec images et avis
+
+Pages Twig : `/`, `/catalogue`, `/produit/{slug}`. API : `/api/products`, `/api/products/{slug}`.
+Next steps: styliser et brancher les endpoints panier/utilisateur (Sprint 2).

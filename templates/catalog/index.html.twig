@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Catalogue | TechNova{% endblock %}
+
+{% block body %}
+<div class="row">
+    <aside class="col-md-3 mb-4">
+        <div class="card">
+            <div class="card-header">Catégories</div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item {% if not activeFilters.category %}active{% endif %}">
+                    <a href="{{ path('catalog_index', { brand: activeFilters.brand }) }}">Toutes</a>
+                </li>
+                {% for category in categories %}
+                    <li class="list-group-item {% if activeFilters.category == category.slug %}active{% endif %}">
+                        <a href="{{ path('catalog_index', { category: category.slug, brand: activeFilters.brand }) }}">{{ category.name }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">Marques</div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item {% if not activeFilters.brand %}active{% endif %}">
+                    <a href="{{ path('catalog_index', { category: activeFilters.category }) }}">Toutes</a>
+                </li>
+                {% for brand in brands %}
+                    <li class="list-group-item {% if activeFilters.brand == brand.slug %}active{% endif %}">
+                        <a href="{{ path('catalog_index', { category: activeFilters.category, brand: brand.slug }) }}">{{ brand.name }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </aside>
+
+    <section class="col-md-9">
+        <h1 class="h4 mb-4">Catalogue</h1>
+        <div class="row g-4">
+            {% for product in products %}
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        {% set mainImage = product.images|first %}
+                        {% if mainImage %}
+                            <img src="{{ mainImage.url }}" class="card-img-top" alt="{{ mainImage.alt }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text">{{ product.shortDescription }}</p>
+                            <p class="fw-bold">{{ product.price|number_format(2, ',', ' ') }} €</p>
+                            <a href="{{ path('product_show', {slug: product.slug}) }}" class="btn btn-outline-primary">Voir</a>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <p>Aucun produit ne correspond à votre recherche.</p>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}

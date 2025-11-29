@@ -28,13 +28,21 @@ Stack & modules clés
 
 Endpoints disponibles
 ---------------------
-| Méthode | Route            | Description                                    | Auth |
-|---------|------------------|------------------------------------------------|------|
-| GET     | `/api/test`      | Vérifie l’uptime de l’API (log dans monolog).  | Publique |
-| GET     | `/api/test-audit`| Génère une entrée dans `audit_log`.            | JWT |
-| GET     | `/api/me`        | Donne les infos du user connecté (id/email).   | JWT |
-| POST    | `/api/login`     | Authentifie via email/password, renvoie JWT.   | Publique |
-| GET     | `/api/docs`      | Swagger UI (documentation interactive).        | Publique (à protéger en prod) |
+| Méthode | Route                | Description                                             | Auth |
+|---------|----------------------|---------------------------------------------------------|------|
+| GET     | `/api/test`          | Vérifie l’uptime de l’API (log dans monolog).           | Publique |
+| GET     | `/api/test-audit`    | Génère une entrée dans `audit_log`.                     | JWT |
+| GET     | `/api/me`            | Infos du user connecté (id/email).                      | JWT |
+| POST    | `/api/login`         | Authentifie via email/password, renvoie JWT.            | Publique |
+| GET     | `/api/products`      | Liste JSON des produits publiés (filtrage catégorie/marque). | Publique |
+| GET     | `/api/products/{slug}` | Fiche produit détaillée (prix, images, avis).         | Publique |
+| GET     | `/api/docs`          | Swagger UI (documentation interactive).                 | Publique (à protéger en prod) |
+
+Pages Twig (catalogue)
+----------------------
+- `/` : accueil + produits récents (données issues des fixtures).
+- `/catalogue` : listing avec filtres catégorie/marque.
+- `/produit/{slug}` : fiche produit détaillée, images et avis.
 
 Installation locale (dev)
 -------------------------
