@@ -20,7 +20,7 @@
 ###< symfony/asset-mapper ###
 
 ###> lexik/jwt-authentication-bundle ###
-/config/jwt/*
-!/config/jwt/private.pem
-!/config/jwt/public.pem
+/config/jwt/*.pem
+/config/jwt/*.key
+/config/jwt/*.crt
 ###< lexik/jwt-authentication-bundle ###
