@@ -10,44 +10,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
-      # 1️⃣ Récupération du code
+      # 1️⃣ Checkout du code du dépôt
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2️⃣ Installation de PHP + extensions requises (prod)
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-          extensions: pdo_pgsql, intl
-          coverage: none
-
-      # 3️⃣ Composer install (PROD MODE)
-      - name: Composer install (prod)
-        run: |
-          composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader --no-scripts
-
-      # 4️⃣ Nettoyage cache + warmup
-      - name: Symfony cache warmup
-        run: |
-          php bin/console cache:clear --env=prod
-          php bin/console cache:warmup --env=prod
-
-      # 5️⃣ Déploiement des fichiers (sans var/, sans .git, sans .github)
-      - name: Sync files to AlwaysData via rsync
+      # 2️⃣ Synchronisation des fichiers vers Alwaysdata (sans dossiers locaux inutiles)
+      - name: Sync sources to Alwaysdata (rsync)
         uses: burnett01/rsync-deployments@7.1.0
         with:
-          switches: -az --delete --exclude=".github" --exclude=".git" --exclude="var/"
-          path: ./ 
+          switches: -az --delete --exclude=".git" --exclude=".github" --exclude="var/" --exclude="vendor/"
+          path: ./
           remote_path: ${{ secrets.DEPLOY_PATH }}
           remote_host: ${{ secrets.SSH_REMOTE_HOST }}
           remote_user: ${{ secrets.SSH_REMOTE_USER }}
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
           remote_port: ${{ secrets.SSH_REMOTE_PORT }}
 
-      # 6️⃣ Création du fichier .env.local.php directement sur AlwaysData
-      - name: Generate .env.local.php on server
+      # 3️⃣ Exécution des commandes Symfony directement sur Alwaysdata
+      - name: Install & migrate on Alwaysdata
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_REMOTE_HOST }}
@@ -55,24 +35,11 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_REMOTE_PORT }}
           script: |
+            set -e
             cd ${{ secrets.DEPLOY_PATH }}
-            echo "<?php return [
-              'APP_ENV' => 'prod',
-              'APP_DEBUG' => '0',
-              'DATABASE_URL' => 'postgresql://technova:Teqapexa59Alwaysdata800@postgresql-technova.alwaysdata.net:5432/technova_api?serverVersion=16&charset=utf8',
-              'JWT_SECRET_KEY' => 'config/jwt/private.pem',
-              'JWT_PUBLIC_KEY' => 'config/jwt/public.pem',
-              'JWT_PASSPHRASE' => 'Teqapexa59Alwaysdata800',
-            ];" > .env.local.php
-
-      # 7️⃣ Lancer les migrations sur AlwaysData (postgresql)
-      - name: Run migrations on AlwaysData
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.SSH_REMOTE_HOST }}
-          username: ${{ secrets.SSH_REMOTE_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_REMOTE_PORT }}
-          script: |
-            cd ${{ secrets.DEPLOY_PATH }}
+            composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+            if [ ! -f config/jwt/private.pem ] || [ ! -f config/jwt/public.pem ]; then
+              php bin/console lexik:jwt:generate-keypair --no-interaction
+            fi
             php bin/console doctrine:migrations:migrate --no-interaction --env=prod
+            php bin/console cache:clear --env=prod --no-warmup
