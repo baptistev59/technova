@@ -2,15 +2,35 @@
 nelmio_api_doc:
     documentation:
         info:
-            title: "TechNova Marketplace — API"
+            title: 'TechNova Marketplace — API'
             description: >
-                Documentation officielle de l'API TechNova.
-                Utilisez /api/login pour obtenir un JWT et tester les endpoints protégés.
-            version: "1.0.0"
+                Backend officiel de la marketplace TechNova. Authentifiez-vous via `/api/login`
+                pour tester les endpoints sécurisés avec un JWT Bearer.
+            version: '1.0.0'
+            contact:
+                name: 'TechNova Team'
+                url: 'https://technova.alwaysdata.net'
+                email: 'support@technova.local'
+        servers:
+            - url: 'https://technova.alwaysdata.net'
+              description: 'Production (Alwaysdata)'
+            - url: 'http://localhost:8000'
+              description: 'Développement local'
+        tags:
+            - name: 'System'
+              description: 'Probing endpoints, healthcheck, audit tests'
+            - name: 'User'
+              description: 'Routes nécessitant un JWT utilisateur'
+        components:
+            securitySchemes:
+                BearerAuth:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+        security:
+            - BearerAuth: []
 
     areas:
         default:
-            # On documente toutes les routes qui commencent par /api,
-            # mais on exclut la doc elle-même pour éviter de la voir dans la doc.
             path_patterns:
                 - ^/api(?!/docs)
