@@ -2,7 +2,10 @@
 
 namespace App\Entity;
 
+use App\Entity\Shop;
 use App\Repository\VendorRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Traits\Timestampable;
 
@@ -39,6 +42,17 @@ class Vendor
 
     #[ORM\OneToOne(mappedBy: 'vendor', cascade: ['persist', 'remove'])]
     private ?User $owner = null;
+
+    /**
+     * @var Collection<int, Shop>
+     */
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Shop::class)]
+    private Collection $shops;
+
+    public function __construct()
+    {
+        $this->shops = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -147,6 +161,33 @@ class Vendor
         }
 
         $this->owner = $owner;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Shop>
+     */
+    public function getShops(): Collection
+    {
+        return $this->shops;
+    }
+
+    public function addShop(Shop $shop): self
+    {
+        if (!$this->shops->contains($shop)) {
+            $this->shops->add($shop);
+            $shop->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeShop(Shop $shop): self
+    {
+        if ($this->shops->removeElement($shop) && $shop->getOwner() === $this) {
+            $shop->setOwner(null);
+        }
 
         return $this;
     }
