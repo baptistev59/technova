@@ -144,7 +144,7 @@ class AppFixtures extends Fixture
                 ->setDescription($data['desc'])
                 ->setPrice($data['price'])
                 ->setStock($data['stock'])
-                ->setSku(strtoupper(substr($data['brand'], 0, 3)) . '-' . random_int(1000, 9999))
+                ->setSku(strtoupper(substr($data['brand'], 0, 3)) . '-' . \random_int(1000, 9999))
                 ->setType('standard')
                 ->setIsFeatured(true)
                 ->setCategory($category)
@@ -162,7 +162,7 @@ class AppFixtures extends Fixture
 
             // Avis court pour donner du réalisme
             $review = (new ProductReview())
-                ->setRating(random_int(4, 5))
+                ->setRating(\random_int(4, 5))
                 ->setComment('Produit adopté ! Qualité premium et livraison rapide.')
                 ->setProduct($product);
 

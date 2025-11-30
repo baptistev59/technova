@@ -8,6 +8,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Entity\User;
 
 /**
  * Permet au front de récupérer rapidement l'utilisateur courant (profil / menu).
@@ -46,9 +47,10 @@ final class MeController extends AbstractController
     )]
     public function me(Security $security): JsonResponse
     {
+        /** @var User|null $user */ 
         $user = $security->getUser();
 
-        if (!$user) {
+        if (!$user instanceof User) {
             return $this->json(['error' => 'Unauthenticated'], 401);
         }
 
