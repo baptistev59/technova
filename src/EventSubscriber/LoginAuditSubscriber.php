@@ -7,6 +7,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationFailureEvent;
 
+/**
+ * Observe les succès/échecs de connexion pour alimenter la table audit_log.
+ */
 class LoginAuditSubscriber implements EventSubscriberInterface
 {
     public function __construct(
@@ -25,6 +28,7 @@ class LoginAuditSubscriber implements EventSubscriberInterface
     {
         $user = $event->getUser();
 
+        // Journalise l'ID utilisateur + email utilisé
         $this->audit->log(
             action: 'LOGIN_SUCCESS',
             resource: 'user',
@@ -40,6 +44,7 @@ class LoginAuditSubscriber implements EventSubscriberInterface
         $exception = $event->getException();
         $token = $event->getToken();
 
+        // Ici on n'a pas d'entité User mais on garde le login tenté + le message
         $this->audit->log(
             action: 'LOGIN_FAILURE',
             resource: 'user',

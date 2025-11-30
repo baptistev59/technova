@@ -7,6 +7,8 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
+ * Répertoire ultra simple : on consomme la liste complète dans les filtres Twig/API.
+ *
  * @extends ServiceEntityRepository<Brand>
  */
 class BrandRepository extends ServiceEntityRepository

@@ -10,6 +10,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Liste des produits avec filtres simples (catégorie + marque) côté Twig.
+ */
 class CatalogController extends AbstractController
 {
     #[Route('/catalogue', name: 'catalog_index')]
@@ -22,11 +25,13 @@ class CatalogController extends AbstractController
         $categorySlug = $request->query->get('category');
         $brandSlug = $request->query->get('brand');
 
+        // On centralise les paramètres pour pouvoir les réafficher dans la vue
         $filters = [
             'category' => $categorySlug,
             'brand' => $brandSlug,
         ];
 
+        // Le repository connaît déjà la logique de filtres → réutilisation côté API/Twig
         $products = $productRepository->filterBy($filters);
         $categories = $categoryRepository->findAll();
         $brands = $brandRepository->findAll();

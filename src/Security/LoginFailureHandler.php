@@ -8,6 +8,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 
+/**
+ * Handler custom pour uniformiser les retours JSON lors d'un login raté.
+ */
 class LoginFailureHandler implements AuthenticationFailureHandlerInterface
 {
     public function __construct(

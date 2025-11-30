@@ -9,6 +9,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
+/**
+ * Route de fiche produit. Symfony injecte directement l'entité via le slug.
+ */
 class ProductController extends AbstractController
 {
     #[Route('/produit/{slug}', name: 'product_show')]

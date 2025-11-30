@@ -14,6 +14,7 @@ Sommaire
 - [Documentation API (Swagger)](#documentation-api-swagger)
 - [Déploiement Alwaysdata (prod)](#déploiement-alwaysdata-prod)
 - [Scripts utiles](#scripts-utiles)
+- [Design / UI](#design--ui)
 
 Stack & modules clés
 --------------------
@@ -146,6 +147,14 @@ Bonnes pratiques / sécurité
 - Swagger étant public, pensez à activer une protection HTTP Basic sur Alwaysdata.  
 - Monitorer `~/logs/php-*.log` sur Alwaysdata pour diagnostiquer les 500.  
 - Les endpoints `/api/test*` peuvent être désactivés en prod (feature flag) via un firewall si nécessaire.
+
+Design / UI
+-----------
+- Maquettes (Figma/PDF) : `docs/maquettes.pdf`
+- Synthèse palette/typo/composants : `docs/design-system.md`
+- Pages Twig alignées sur ces maquettes : `/`, `/catalogue`, `/produit/{slug}`
+- **Assets locaux** : toutes les illustrations/placeholder sont versionnées dans `public/assets/images/` pour éviter les liens externes (logo, hero, pictos catégories, visuels produits).
+- **Commentaires Twig** : chaque template (`templates/catalog/*.html.twig` + `templates/base.html.twig`) contient des commentaires en français qui servent de pense-bête pour se rappeler le rôle des sections (utile pour la soutenance).
 
 🚀 Bon déploiement !
 --------------------

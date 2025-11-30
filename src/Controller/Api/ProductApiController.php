@@ -8,6 +8,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * API publique qui expose la liste de produits prêts pour le front (React/Twig).
+ * Chaque méthode renvoie un JSON épuré pour ne pas exposer d'informations inutiles.
+ */
 #[Route('/api/products')]
 class ProductApiController extends AbstractController
 {
@@ -18,6 +22,7 @@ class ProductApiController extends AbstractController
     #[Route('', name: 'api_products_index', methods: ['GET'])]
     public function index(): JsonResponse
     {
+        // Pas de filtre → on récupère les produits publiés via le repo dédié
         $products = $this->productRepository->filterBy([]);
 
         return $this->json(array_map([$this, 'serializeProduct'], $products));
@@ -26,6 +31,7 @@ class ProductApiController extends AbstractController
     #[Route('/{slug}', name: 'api_products_show', methods: ['GET'])]
     public function show(string $slug): JsonResponse
     {
+        // Rappel : on force isPublished pour éviter d'exposer un brouillon
         $product = $this->productRepository->findOneBy(['slug' => $slug, 'isPublished' => true]);
 
         if (!$product) {
@@ -35,6 +41,9 @@ class ProductApiController extends AbstractController
         return $this->json($this->serializeProduct($product, true));
     }
 
+    /**
+     * Mini normalizer maison : idéal pour garder le contrôle sur les champs exposés.
+     */
     private function serializeProduct($product, bool $includeDetails = false): array
     {
         $data = [
@@ -48,6 +57,7 @@ class ProductApiController extends AbstractController
         ];
 
         if ($includeDetails) {
+            // Mode fiche complète : on expose description, stock, galeries et avis
             $data['description'] = $product->getDescription();
             $data['stock'] = $product->getStock();
             $data['images'] = array_map(fn($img) => $img->getUrl(), $product->getImages()->toArray());

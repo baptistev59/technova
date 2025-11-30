@@ -3,59 +3,52 @@
 {% block title %}Catalogue | TechNova{% endblock %}
 
 {% block body %}
-<div class="row">
-    <aside class="col-md-3 mb-4">
-        <div class="card">
-            <div class="card-header">Catégories</div>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item {% if not activeFilters.category %}active{% endif %}">
-                    <a href="{{ path('catalog_index', { brand: activeFilters.brand }) }}">Toutes</a>
-                </li>
+{# Entête catalogue : champs de recherche/tri #}
+<section class="tn-section">
+    <h1>Catalogue produits</h1>
+    <div class="tn-filters">
+        <input type="text" placeholder="Rechercher un produit…">
+        <div class="tn-select">
+            <select onchange="window.location=this.value">
+                <option value="{{ path('catalog_index', { brand: activeFilters.brand }) }}" {{ not activeFilters.category ? 'selected' }}>Catégorie</option>
                 {% for category in categories %}
-                    <li class="list-group-item {% if activeFilters.category == category.slug %}active{% endif %}">
-                        <a href="{{ path('catalog_index', { category: category.slug, brand: activeFilters.brand }) }}">{{ category.name }}</a>
-                    </li>
+                    <option value="{{ path('catalog_index', { category: category.slug, brand: activeFilters.brand }) }}" {{ activeFilters.category == category.slug ? 'selected' }}>{{ category.name }}</option>
                 {% endfor %}
-            </ul>
+            </select>
         </div>
-
-        <div class="card mt-4">
-            <div class="card-header">Marques</div>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item {% if not activeFilters.brand %}active{% endif %}">
-                    <a href="{{ path('catalog_index', { category: activeFilters.category }) }}">Toutes</a>
-                </li>
+        <div class="tn-select">
+            <select onchange="window.location=this.value">
+                <option value="{{ path('catalog_index', { category: activeFilters.category }) }}" {{ not activeFilters.brand ? 'selected' }}>Marque</option>
                 {% for brand in brands %}
-                    <li class="list-group-item {% if activeFilters.brand == brand.slug %}active{% endif %}">
-                        <a href="{{ path('catalog_index', { category: activeFilters.category, brand: brand.slug }) }}">{{ brand.name }}</a>
-                    </li>
+                    <option value="{{ path('catalog_index', { category: activeFilters.category, brand: brand.slug }) }}" {{ activeFilters.brand == brand.slug ? 'selected' }}>{{ brand.name }}</option>
                 {% endfor %}
-            </ul>
+            </select>
         </div>
-    </aside>
+    </div>
+</section>
 
-    <section class="col-md-9">
-        <h1 class="h4 mb-4">Catalogue</h1>
-        <div class="row g-4">
-            {% for product in products %}
-                <div class="col-md-4">
-                    <div class="card h-100 shadow-sm">
-                        {% set mainImage = product.images|first %}
-                        {% if mainImage %}
-                            <img src="{{ mainImage.url }}" class="card-img-top" alt="{{ mainImage.alt }}">
-                        {% endif %}
-                        <div class="card-body">
-                            <h5 class="card-title">{{ product.name }}</h5>
-                            <p class="card-text">{{ product.shortDescription }}</p>
-                            <p class="fw-bold">{{ product.price|number_format(2, ',', ' ') }} €</p>
-                            <a href="{{ path('product_show', {slug: product.slug}) }}" class="btn btn-outline-primary">Voir</a>
-                        </div>
-                    </div>
+{# Grille principale du catalogue #}
+<section class="tn-section">
+    <div class="tn-products-grid">
+        {% for product in products %}
+            <article class="tn-product-card">
+                {% set mainImage = product.images|first %}
+                {% if mainImage %}
+                    <img src="{{ mainImage.url }}" alt="{{ mainImage.alt }}">
+                {% else %}
+                    <img src="{{ asset('assets/images/product-placeholder.svg') }}" alt="Visuel par défaut">
+                {% endif %}
+                <h3>{{ product.name }}</h3>
+                <p class="tn-product-card__excerpt">{{ product.shortDescription }}</p>
+                <div class="tn-product-card__meta">
+                    <span>{{ product.brand ? product.brand.name : product.shop.name }}</span>
+                    <strong>{{ product.price|number_format(2, ',', ' ') }} €</strong>
                 </div>
-            {% else %}
-                <p>Aucun produit ne correspond à votre recherche.</p>
-            {% endfor %}
-        </div>
-    </section>
-</div>
+                <a class="btn btn-primary" href="{{ path('product_show', {slug: product.slug}) }}">Voir le produit</a>
+            </article>
+        {% else %}
+            <p>Aucun produit ne correspond à votre recherche.</p>
+        {% endfor %}
+    </div>
+</section>
 {% endblock %}

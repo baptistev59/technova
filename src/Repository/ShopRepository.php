@@ -7,6 +7,8 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
+ * Référentiel pour les boutiques. Pour l’instant on ne fait que findOne/findAll.
+ *
  * @extends ServiceEntityRepository<Shop>
  */
 class ShopRepository extends ServiceEntityRepository

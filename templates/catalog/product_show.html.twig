@@ -3,41 +3,72 @@
 {% block title %}{{ product.name }} | TechNova{% endblock %}
 
 {% block body %}
-<div class="row">
-    <div class="col-md-6">
+{# Bloc principal affichant la galerie et les infos produit #}
+<section class="tn-product-layout">
+    <div class="tn-product-gallery">
         {% set mainImage = product.images|first %}
         {% if mainImage %}
-            <img src="{{ mainImage.url }}" class="img-fluid mb-3" alt="{{ mainImage.alt }}">
+            <img src="{{ mainImage.url }}" alt="{{ mainImage.alt }}">
+        {% else %}
+            <img src="{{ asset('assets/images/product-placeholder.svg') }}" alt="Visuel par défaut">
         {% endif %}
-        <div class="row g-2">
+        <div class="tn-product-gallery__thumbs">
             {% for image in product.images %}
-            <div class="col-4">
-                <img src="{{ image.url }}" class="img-fluid" alt="{{ image.alt }}">
-            </div>
+                <img src="{{ image.url }}" alt="{{ image.alt }}">
+            {% else %}
+                <img src="{{ asset('assets/images/product-placeholder.svg') }}" alt="Visuel par défaut">
             {% endfor %}
         </div>
     </div>
-    <div class="col-md-6">
+    <div class="tn-product-info">
+        <p class="tn-product-info__category">{{ product.category.name }}</p>
         <h1>{{ product.name }}</h1>
-        <p class="text-muted">{{ product.brand ? product.brand.name ~ ' · ' : '' }}{{ product.category.name }}</p>
-        <p class="lead">{{ product.price|number_format(2, ',', ' ') }} €</p>
+        <p class="tn-product-info__price">{{ product.price|number_format(2, ',', ' ') }} €</p>
         <p>{{ product.description }}</p>
-        <p><strong>Stock :</strong> {{ product.stock > 0 ? product.stock ~ ' disponibles' : 'Rupture' }}</p>
         <a class="btn btn-primary" href="#">Ajouter au panier</a>
-    </div>
-</div>
-
-<section class="mt-5">
-    <h2 class="h5">Avis clients</h2>
-    {% if product.reviews|length > 0 %}
-        {% for review in product.reviews %}
-            <div class="border rounded p-3 mb-3">
-                <strong>Note :</strong> {{ review.rating }}/5<br>
-                <p class="mb-0">{{ review.comment }}</p>
+        <div class="tn-product-meta">
+            <div>
+                <strong>Marque</strong>
+                <p>{{ product.brand ? product.brand.name : 'TechNova' }}</p>
             </div>
-        {% endfor %}
-    {% else %}
-        <p>Aucun avis pour le moment.</p>
-    {% endif %}
+            <div>
+                <strong>Stock</strong>
+                <p>{{ product.stock > 0 ? product.stock ~ ' disponibles' : 'Rupture' }}</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# Caractéristiques synthétiques pour rappeler les points forts #}
+<section class="tn-section">
+    <div class="tn-section__header">
+        <h2>Caractéristiques du produit</h2>
+    </div>
+    <div class="tn-product-specs">
+        <ul>
+            <li>Garantie : 2 ans</li>
+            <li>Poids : 1,2 kg</li>
+            <li>SKU : {{ product.sku ?: 'N/A' }}</li>
+        </ul>
+    </div>
+</section>
+
+{# Avis clients fictifs issus des fixtures #}
+<section class="tn-section">
+    <div class="tn-section__header">
+        <h2>Avis clients</h2>
+    </div>
+    <div class="tn-reviews">
+        {% if product.reviews|length > 0 %}
+            {% for review in product.reviews %}
+                <article>
+                    <strong>{{ review.rating }}/5</strong>
+                    <p>{{ review.comment }}</p>
+                </article>
+            {% endfor %}
+        {% else %}
+            <p>Aucun avis pour le moment.</p>
+        {% endif %}
+    </div>
 </section>
 {% endblock %}

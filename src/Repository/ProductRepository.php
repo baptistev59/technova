@@ -17,6 +17,8 @@ class ProductRepository extends ServiceEntityRepository
     }
 
     /**
+     * Retourne les derniers produits publiés pour alimenter la home/sections "nouveautés".
+     *
      * @return Product[]
      */
     public function findLatestPublished(int $limit = 8): array
@@ -31,6 +33,8 @@ class ProductRepository extends ServiceEntityRepository
     }
 
     /**
+     * Filtrage partagé entre l'API et les pages Twig (catégorie + marque).
+     *
      * @param array{category?: string|null, brand?: string|null} $filters
      * @return Product[]
      */

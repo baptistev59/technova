@@ -8,6 +8,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Service centralisé pour tracer les actions importantes (logins, commandes, etc.).
+ * On peut l'appeler depuis n'importe quel contrôleur/handler/subscriber.
+ */
 class AuditLoggerService
 {
     public function __construct(
@@ -16,6 +20,9 @@ class AuditLoggerService
         private RequestStack $requestStack,
     ) {}
 
+    /**
+     * Petite API interne : on passe l'action + ressource + données contextuelles.
+     */
     public function log(
         string $action,
         ?string $resource = null,

@@ -7,6 +7,8 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
+ * Utile pour aplatir les avis dans l'API si besoin (count, moyenne, etc.).
+ *
  * @extends ServiceEntityRepository<ProductReview>
  */
 class ProductReviewRepository extends ServiceEntityRepository

@@ -4,35 +4,86 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}TechNova Marketplace{% endblock %}</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
-        <div class="container">
-            <a class="navbar-brand" href="{{ path('homepage') }}">TechNova</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link" href="{{ path('catalog_index') }}">Catalogue</a></li>
-                </ul>
+    <header class="tn-header">
+        <div class="tn-topbar">
+            {# En-tête principal disponible sur toutes les pages #}
+            <a class="tn-logo" href="{{ path('homepage') }}">
+                <img class="tn-logo-img" src="{{ asset('assets/images/logo-technova.svg') }}" alt="TechNova">
+                <div>
+                    <strong>TechNova</strong>
+                    <small>Explorez l'innovation technologique</small>
+                </div>
+            </a>
+            <nav class="tn-nav-links">
+                <a href="{{ path('catalog_index') }}">Produits</a>
+                <a href="#">Vendeurs</a>
+                <a href="#">Aide</a>
+            </nav>
+            <div class="tn-search">
+                <input type="text" placeholder="Rechercher un produit…">
+            </div>
+            <div class="tn-auth">
+                <a class="btn btn-outline" href="#">Connexion</a>
+                <a class="btn btn-primary" href="#">S’inscrire</a>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <main class="container mb-5">
+    <main class="tn-main">
         {% block body %}{% endblock %}
     </main>
 
-    <footer class="bg-light py-4 mt-auto">
-        <div class="container text-center">
-            <small>&copy; {{ "now"|date("Y") }} TechNova Marketplace</small>
+    <footer class="tn-footer">
+        <div class="tn-footer__brand">
+            <div class="tn-logo">
+                <img class="tn-logo-img" src="{{ asset('assets/images/logo-technova.svg') }}" alt="TechNova">
+                <div>
+                    <strong>TechNova</strong>
+                    <small>Trouvez les meilleurs produits tech.</small>
+                </div>
+            </div>
         </div>
+        <div class="tn-footer__grid">
+            <div>
+                <h5>À propos</h5>
+                <a href="#">Qui sommes-nous</a>
+                <a href="#">Carrières</a>
+                <a href="#">Blog</a>
+                <a href="#">Presse</a>
+            </div>
+            <div>
+                <h5>Aide</h5>
+                <a href="#">Centre d’aide</a>
+                <a href="#">Livraison</a>
+                <a href="#">Retours</a>
+                <a href="#">Contact</a>
+            </div>
+            <div>
+                <h5>Légal</h5>
+                <a href="#">CGV</a>
+                <a href="#">Mentions légales</a>
+                <a href="#">Confidentialité</a>
+                <a href="#">Cookies</a>
+            </div>
+            <div class="tn-footer__social">
+                <h5>Réseaux</h5>
+                <div class="tn-social-icons">
+                    <span>✕</span>
+                    <span>📸</span>
+                    <span>💼</span>
+                    <span>📘</span>
+                </div>
+            </div>
+        </div>
+        <div class="tn-footer__bottom">&copy; {{ "now"|date("Y") }} TechNova Marketplace. Tous droits réservés.</div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     {% block javascripts %}{% endblock %}
 </body>
 </html>

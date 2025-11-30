@@ -9,6 +9,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * Permet au front de récupérer rapidement l'utilisateur courant (profil / menu).
+ */
 final class MeController extends AbstractController
 {
     #[Route('/api/me', name: 'api_me', methods: ['GET'])]
@@ -49,6 +52,7 @@ final class MeController extends AbstractController
             return $this->json(['error' => 'Unauthenticated'], 401);
         }
 
+        // On ne renvoie que les informations utiles au front
         return $this->json([
             'id' => $user->getId(),
             'email' => $user->getEmail(),

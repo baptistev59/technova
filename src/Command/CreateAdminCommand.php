@@ -17,6 +17,10 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
     name: 'app:create-admin',
     description: 'Crée un utilisateur administrateur (mode interactif)',
 )]
+/**
+ * Commande utilitaire pour rejouer la création d'un admin en local/prod.
+ * Utile après un chargement de fixtures ou un reset de base Alwaysdata.
+ */
 class CreateAdminCommand extends Command
 {
     public function __construct(

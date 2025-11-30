@@ -8,6 +8,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * Permet de tester rapidement la chaîne d'audit (utile pour la soutenance).
+ */
 class TestAuditController extends AbstractController
 {
     #[Route('/api/test-audit', name: 'api_test_audit', methods: ['GET'])]
@@ -31,6 +34,7 @@ class TestAuditController extends AbstractController
     )]
     public function index(AuditLoggerService $audit): JsonResponse
     {
+        // On écrit volontairement une entrée pour vérifier la base et le service
         $audit->log(
             action: 'TEST_AUDIT',
             resource: 'test_endpoint',
