@@ -42,10 +42,8 @@ class ProductRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('p')
             ->andWhere('p.isPublished = :published')
             ->andWhere('p.isFeatured = :featured')
-            ->setParameters([
-                'published' => true,
-                'featured' => true,
-            ])
+            ->setParameter('published', true)
+            ->setParameter('featured', true)
             ->orderBy('p.updatedAt', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
