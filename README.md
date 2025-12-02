@@ -14,6 +14,7 @@ Sommaire
 - [Documentation API (Swagger)](#documentation-api-swagger)
 - [Déploiement Alwaysdata (prod)](#déploiement-alwaysdata-prod)
 - [Scripts utiles](#scripts-utiles)
+- [Comptes de démo](#comptes-de-démo)
 - [Design / UI](#design--ui)
 
 Stack & modules clés
@@ -155,6 +156,10 @@ Design / UI
 - Pages Twig alignées sur ces maquettes : `/`, `/catalogue`, `/produit/{slug}`
 - **Assets locaux** : toutes les illustrations/placeholder sont versionnées dans `public/assets/images/` pour éviter les liens externes (logo, hero, pictos catégories, visuels produits).
 - **Commentaires Twig** : chaque template (`templates/catalog/*.html.twig` + `templates/base.html.twig`) contient des commentaires en français qui servent de pense-bête pour se rappeler le rôle des sections (utile pour la soutenance).
+
+Comptes de démo
+---------------
+- Les fixtures injectent un admin et dix comptes vendeurs. Les identifiants/mots de passe sont listés dans `docs/fixtures-users.md`.
 
 🚀 Bon déploiement !
 --------------------

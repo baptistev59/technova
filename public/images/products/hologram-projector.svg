@@ -1,0 +1,13 @@
+<svg width="640" height="400" viewBox="0 0 640 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="holo" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#c6ffdd"/>
+      <stop offset="50%" stop-color="#fbd786"/>
+      <stop offset="100%" stop-color="#f7797d"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" rx="32" fill="#1a0022"/>
+  <rect x="210" y="250" width="220" height="30" rx="15" fill="#4a148c"/>
+  <polygon points="200,250 320,80 440,250" fill="url(#holo)" opacity="0.85"/>
+  <text x="50%" y="360" text-anchor="middle" fill="#ffe0f3" font-family="Inter, sans-serif" font-size="26">Holographic Display</text>
+</svg>
