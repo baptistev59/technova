@@ -1048,6 +1048,39 @@ img {
     font-size: .9rem;
 }
 
+.tn-variants-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
+.tn-variants-list article {
+    background: var(--tn-surface);
+    border-radius: 16px;
+    padding: 1.25rem;
+    border: 1px solid var(--tn-border);
+    box-shadow: 0 10px 25px rgba(10, 33, 65, .06);
+}
+
+.tn-variant-price {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: .6rem 0;
+}
+
+.tn-variant-old {
+    display: inline-block;
+    margin-right: .5rem;
+    text-decoration: line-through;
+    color: var(--tn-muted);
+    font-size: .95rem;
+}
+
+.tn-variant-stock {
+    color: var(--tn-muted);
+    margin: 0;
+}
+
 .tn-reviews {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));

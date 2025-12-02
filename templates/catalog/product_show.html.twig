@@ -56,30 +56,61 @@
     </div>
 </section>
 
-{# Options (couleurs, variantes) #}
-<section class="tn-section">
-    <div class="tn-section__header">
-        <h2>Options disponibles</h2>
-    </div>
-    <div class="tn-options">
-        <div>
-            <h3>Couleurs</h3>
-            <div class="tn-chips">
-                {% for color in options.colors %}
-                    <span>{{ color }}</span>
-                {% endfor %}
-            </div>
+{% if optionGroups is not empty %}
+    <section class="tn-section">
+        <div class="tn-section__header">
+            <h2>Options disponibles</h2>
         </div>
-        <div>
-            <h3>Variantes</h3>
-            <div class="tn-chips">
-                {% for variant in options.variants %}
-                    <span>{{ variant }}</span>
-                {% endfor %}
-            </div>
+        <div class="tn-options">
+            {% for group in optionGroups %}
+                <div>
+                    <h3>{{ group.name }}</h3>
+                    <div class="tn-chips">
+                        {% for value in group.values %}
+                            <span>{{ value.label }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
         </div>
-    </div>
-</section>
+    </section>
+{% endif %}
+
+{% if variantData is not empty %}
+    <section class="tn-section">
+        <div class="tn-section__header">
+            <h2>Variantes proposées</h2>
+        </div>
+        <div class="tn-variants-list">
+            {% for variant in variantData %}
+                <article>
+                    <strong>
+                        {% if variant.metadata %}
+                            {{ variant.metadata|values|join(' • ') }}
+                        {% else %}
+                            Configuration standard
+                        {% endif %}
+                    </strong>
+                    <p class="tn-variant-price">
+                        {% if variant.promoPrice %}
+                            <span class="tn-variant-old">{{ variant.price|number_format(2, ',', ' ') }} €</span>
+                            <span>{{ variant.promoPrice|number_format(2, ',', ' ') }} €</span>
+                        {% else %}
+                            {{ variant.price|number_format(2, ',', ' ') }} €
+                        {% endif %}
+                    </p>
+                    <p class="tn-variant-stock">
+                        {% if variant.stock > 0 %}
+                            {{ variant.stock }} en stock
+                        {% else %}
+                            Réapprovisionnement en cours
+                        {% endif %}
+                    </p>
+                </article>
+            {% endfor %}
+        </div>
+    </section>
+{% endif %}
 
 {# Avis clients fictifs issus des fixtures #}
 <section class="tn-section">

@@ -26,6 +26,7 @@ Stack & modules clés
 - **Documentation** – NelmioApiDocBundle + Swagger UI exposé sur `/api/docs`.  
 - **Sécurité** – Firewalls séparés (`/api/login`, `/api/docs`, zone `/api/**` protégée).  
 - **Front tooling** – AssetMapper + Stimulus pour interfacer la doc ou l’admin.  
+- **Catalogue avancé** – Attributs/valeurs/variantes (prix/promo/stock/image par combinaison) + sélection d’options côté front.  
 - **Monitoring** – Monolog JSON sur `php://stderr` en prod (Alwaysdata récupère les logs PHP).
 
 Endpoints disponibles
@@ -36,15 +37,25 @@ Endpoints disponibles
 | GET     | `/api/test-audit`    | Génère une entrée dans `audit_log`.                     | JWT |
 | GET     | `/api/me`            | Infos du user connecté (id/email).                      | JWT |
 | POST    | `/api/login`         | Authentifie via email/password, renvoie JWT.            | Publique |
-| GET     | `/api/products`      | Liste JSON des produits publiés (filtrage catégorie/marque). | Publique |
-| GET     | `/api/products/{slug}` | Fiche produit détaillée (prix, images, avis).         | Publique |
+| GET     | `/api/products`      | Liste JSON des produits publiés (filtres catégorie/marque/prix/texte + tri). | Publique |
+| GET     | `/api/products/{slug}` | Fiche produit détaillée (prix, variantes, images, avis).         | Publique |
+
+**Query params utiles (`/api/products`)**
+
+| Paramètre | Exemple | Description |
+|-----------|---------|-------------|
+| `category` | `future-laptops` | Filtre par slug de catégorie |
+| `brand` | `aurora-dynamics` | Filtre par marque |
+| `minPrice` / `maxPrice` | `minPrice=500&maxPrice=2500` | Fourchette de prix (euros) |
+| `search` | `quantum` | Recherche plein texte dans le nom / résumé |
+| `sort` | `price_desc` | `newest`, `oldest`, `price_asc`, `price_desc` |
 | GET     | `/api/docs`          | Swagger UI (documentation interactive).                 | Publique (à protéger en prod) |
 
 Pages Twig (catalogue)
 ----------------------
-- `/` : accueil + produits récents (données issues des fixtures).
-- `/catalogue` : listing avec filtres catégorie/marque.
-- `/produit/{slug}` : fiche produit détaillée, images et avis.
+- `/` : accueil + sections “Nouveautés” et “Produits à la une”.
+- `/catalogue` : listing avec filtres catégorie/marque/prix/texte + tri.
+- `/produit/{slug}` : fiche produit (images, caractéristiques, options, variantes).
 
 Installation locale (dev)
 -------------------------

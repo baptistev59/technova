@@ -5,8 +5,11 @@ namespace App\DataFixtures;
 use App\Entity\Brand;
 use App\Entity\Category;
 use App\Entity\Product;
+use App\Entity\ProductAttribute;
+use App\Entity\ProductAttributeValue;
 use App\Entity\ProductImage;
 use App\Entity\ProductReview;
+use App\Entity\ProductVariant;
 use App\Entity\Shop;
 use App\Entity\User;
 use App\Entity\Vendor;
@@ -194,6 +197,11 @@ class AppFixtures extends Fixture
 
                 $this->attachImage($product, $template['image']);
                 $this->attachReviews($manager, $product, $reviews);
+
+                $attributeDefinitions = $template['attributes'] ?? $this->getAttributeBlueprint();
+                $attributeSets = $this->createAttributesForProduct($manager, $product, $attributeDefinitions);
+                $totalStock = $this->generateVariantsForProduct($manager, $product, $attributeSets, $price);
+                $product->setStock($totalStock);
 
                 $manager->persist($product);
             }
@@ -482,6 +490,7 @@ class AppFixtures extends Fixture
                 'type' => 'computer',
                 'short' => 'Ultrabook 16" avec coprocesseur neuronal QX-5.',
                 'description' => 'Double écran OLED, module IA embarqué et batterie 30h pour coder, monter ou générer des médias hors-ligne.',
+                'attributes' => $this->getAttributeBlueprint(),
             ],
             [
                 'name' => 'Helix Fold X',
@@ -492,6 +501,7 @@ class AppFixtures extends Fixture
                 'type' => 'xr-headset',
                 'short' => 'Casque XR multi-focal avec suivi oculaire.',
                 'description' => 'Matériau respirant, résolution 5K par œil et intégration native avec les espaces collaboratifs TechNova.',
+                'attributes' => $this->getAttributeBlueprint(),
             ],
             [
                 'name' => 'Pulse Glide S',
@@ -502,6 +512,7 @@ class AppFixtures extends Fixture
                 'type' => 'mobility',
                 'short' => 'Trottinette autonome avec évitement d’obstacles.',
                 'description' => 'Autonomie 80km, recharge solaire latente et pilotage vocal sécurisé.',
+                'attributes' => $this->getAttributeBlueprint(),
             ],
             [
                 'name' => 'Nexa Cubic',
@@ -512,6 +523,7 @@ class AppFixtures extends Fixture
                 'type' => 'speaker',
                 'short' => 'Enceinte spatiale qui adapte la musique à l’humeur.',
                 'description' => 'Analyse biométrique via les micros et génération automatique de playlists personnalisées.',
+                'attributes' => $this->getAttributeBlueprint(),
             ],
             [
                 'name' => 'Helios Freight',
@@ -522,6 +534,7 @@ class AppFixtures extends Fixture
                 'type' => 'drone',
                 'short' => 'Drone cargo silencieux pour la logistique urbaine.',
                 'description' => 'Charge utile 20kg, planification IA et parachute d’urgence.',
+                'attributes' => $this->getAttributeBlueprint(),
             ],
             [
                 'name' => 'Lumina Core Home',
@@ -532,6 +545,7 @@ class AppFixtures extends Fixture
                 'type' => 'hub',
                 'short' => 'Hub domotique holographique multi-room.',
                 'description' => 'Projection 3D des indicateurs énergétiques, automatisation des scènes et API ouverte.',
+                'attributes' => $this->getAttributeBlueprint(),
             ],
             [
                 'name' => 'Solara Trek Pack',
@@ -542,6 +556,7 @@ class AppFixtures extends Fixture
                 'type' => 'energy',
                 'short' => 'Sac à dos solaire générant jusqu’à 120W.',
                 'description' => 'Batterie Graphène, ports USB-C 240W et charge par induction pour drones.',
+                'attributes' => $this->getAttributeBlueprint(),
             ],
             [
                 'name' => 'Quantum Ring Pulse',
@@ -552,6 +567,7 @@ class AppFixtures extends Fixture
                 'type' => 'wearable',
                 'short' => 'Anneau biométrique avec capteurs sanguins non invasifs.',
                 'description' => 'Algorithmes prédictifs pour anticiper fatigue et micro-stress.',
+                'attributes' => $this->getAttributeBlueprint(),
             ],
             [
                 'name' => 'Orbit Neo Companion',
@@ -562,6 +578,7 @@ class AppFixtures extends Fixture
                 'type' => 'robot',
                 'short' => 'Robot compagnon modulable pour les familles.',
                 'description' => 'Reconnaissance émotionnelle, bras articulé modulable et contrôle vocal multi-utilisateur.',
+                'attributes' => $this->getAttributeBlueprint(),
             ],
             [
                 'name' => 'HoloBeam Studio',
@@ -572,6 +589,7 @@ class AppFixtures extends Fixture
                 'type' => 'hologram',
                 'short' => 'Projecteur holographique autonome 4K.',
                 'description' => 'Streaming direct depuis Figma / Blender, interactivité tactile et enregistrement volumétrique.',
+                'attributes' => $this->getAttributeBlueprint(),
             ],
             [
                 'name' => 'Axon Neural Pen',
@@ -582,6 +600,7 @@ class AppFixtures extends Fixture
                 'type' => 'accessory',
                 'short' => 'Stylet neuronal qui retranscrit la pensée en croquis.',
                 'description' => 'Capteurs EMG miniaturisés et export vectoriel instantané.',
+                'attributes' => $this->getAttributeBlueprint(),
             ],
             [
                 'name' => 'Helix Micro Drone',
@@ -592,6 +611,7 @@ class AppFixtures extends Fixture
                 'type' => 'drone',
                 'short' => 'Drone caméra autonome pour créateurs nomades.',
                 'description' => 'Stabilisation 8 axes, suivi IA des sujets et transmission chiffrée.',
+                'attributes' => $this->getAttributeBlueprint(),
             ],
         ];
     }
@@ -610,6 +630,170 @@ class AppFixtures extends Fixture
     private function slug(string $value): string
     {
         return strtolower($this->slugger->slug($value)->toString());
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $definitions
+     * @return array<int, array{
+     *     attribute: ProductAttribute,
+     *     values: array<int, array{entity: ProductAttributeValue, definition: array}>
+     * }>
+     */
+    private function createAttributesForProduct(ObjectManager $manager, Product $product, array $definitions): array
+    {
+        $sets = [];
+        foreach ($definitions as $index => $definition) {
+            $attribute = (new ProductAttribute())
+                ->setName($definition['name'])
+                ->setSlug($definition['slug'])
+                ->setInputType($definition['type'] ?? 'select')
+                ->setPosition($index);
+
+            $attribute->setProduct($product);
+            $manager->persist($attribute);
+
+            $values = [];
+            foreach ($definition['values'] as $valueDef) {
+                $value = (new ProductAttributeValue())
+                    ->setValue($valueDef['label'])
+                    ->setSlug($valueDef['slug'])
+                    ->setColorHex($valueDef['hex'] ?? null)
+                    ->setAttribute($attribute);
+
+                $manager->persist($value);
+                $values[] = [
+                    'entity' => $value,
+                    'definition' => $valueDef,
+                ];
+            }
+
+            $sets[] = [
+                'attribute' => $attribute,
+                'values' => $values,
+            ];
+        }
+
+        return $sets;
+    }
+
+    /**
+     * @param array<int, array{
+     *     attribute: ProductAttribute,
+     *     values: array<int, array{entity: ProductAttributeValue, definition: array}>
+     * }> $attributeSets
+     */
+    private function generateVariantsForProduct(ObjectManager $manager, Product $product, array $attributeSets, float $basePrice): int
+    {
+        $combinations = $this->buildAttributeCombinations($attributeSets);
+        $totalStock = 0;
+        $index = 1;
+
+        foreach ($combinations as $combo) {
+            $price = $basePrice;
+            $configuration = [];
+            $metadata = [];
+
+            foreach ($combo as $selection) {
+                $definition = $selection['definition'];
+                $price += $basePrice * ($definition['priceDelta'] ?? 0);
+                if (isset($definition['priceFlat'])) {
+                    $price += $definition['priceFlat'];
+                }
+
+                $configuration[$selection['attribute']->getSlug()] = $selection['value']->getSlug();
+                $metadata[$selection['attribute']->getSlug()] = $selection['value']->getValue();
+            }
+
+            $stock = random_int(3, 25);
+            $totalStock += $stock;
+
+            $promoPrice = null;
+            if ($index % 4 === 0) {
+                $promoPrice = round($price * 0.9, 2);
+            }
+
+            $variant = (new ProductVariant())
+                ->setProduct($product)
+                ->setPrice(round($price, 2))
+                ->setPromoPrice($promoPrice)
+                ->setStock($stock)
+                ->setIsAvailable(true)
+                ->setImagePath($product->getImages()->first()?->getUrl())
+                ->setConfiguration($configuration ?: null)
+                ->setMetadata($metadata ?: null)
+                ->setSku(sprintf(
+                    '%s-%02d',
+                    strtoupper(substr($product->getSku() ?? $product->getSlug(), 0, 6)),
+                    $index
+                ))
+                ->setBarcode($this->generateBarcode());
+
+            $manager->persist($variant);
+            $product->addVariant($variant);
+            $index++;
+        }
+
+        return $totalStock;
+    }
+
+    /**
+     * @return array<int, array<int, array{
+     *     attribute: ProductAttribute,
+     *     value: ProductAttributeValue,
+     *     definition: array
+     * }>>
+     */
+    private function buildAttributeCombinations(array $attributeSets): array
+    {
+        if (empty($attributeSets)) {
+            return [[]];
+        }
+
+        $result = [[]];
+
+        foreach ($attributeSets as $set) {
+            $newResult = [];
+            foreach ($result as $partial) {
+                foreach ($set['values'] as $valueInfo) {
+                    $combo = $partial;
+                    $combo[] = [
+                        'attribute' => $set['attribute'],
+                        'value' => $valueInfo['entity'],
+                        'definition' => $valueInfo['definition'],
+                    ];
+                    $newResult[] = $combo;
+                }
+            }
+            $result = $newResult;
+        }
+
+        return $result;
+    }
+
+    private function getAttributeBlueprint(): array
+    {
+        return [
+            [
+                'slug' => 'color',
+                'name' => 'Couleur',
+                'type' => 'chips',
+                'values' => [
+                    ['slug' => 'tech-blue', 'label' => 'Bleu TechNova', 'hex' => '#1E88E5', 'priceDelta' => 0],
+                    ['slug' => 'graphite', 'label' => 'Graphite', 'hex' => '#4F5B66', 'priceDelta' => 0.02],
+                    ['slug' => 'sunset', 'label' => 'Orange Aurora', 'hex' => '#FF8B3D', 'priceDelta' => 0.03],
+                ],
+            ],
+            [
+                'slug' => 'edition',
+                'name' => 'Edition',
+                'type' => 'select',
+                'values' => [
+                    ['slug' => 'standard', 'label' => 'Standard', 'priceDelta' => 0],
+                    ['slug' => 'pro', 'label' => 'Pro', 'priceDelta' => 0.12],
+                    ['slug' => 'ultra', 'label' => 'Ultra', 'priceDelta' => 0.22],
+                ],
+            ],
+        ];
     }
 
     private function generateSku(string $brandSlug): string

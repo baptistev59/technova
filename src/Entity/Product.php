@@ -80,10 +80,24 @@ class Product
     #[ORM\OneToMany(mappedBy: 'product', targetEntity: ProductReview::class, orphanRemoval: true)]
     private Collection $reviews;
 
+    /**
+     * @var Collection<int, ProductAttribute>
+     */
+    #[ORM\OneToMany(mappedBy: 'product', targetEntity: ProductAttribute::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $attributes;
+
+    /**
+     * @var Collection<int, ProductVariant>
+     */
+    #[ORM\OneToMany(mappedBy: 'product', targetEntity: ProductVariant::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $variants;
+
     public function __construct()
     {
         $this->images = new ArrayCollection();
         $this->reviews = new ArrayCollection();
+        $this->attributes = new ArrayCollection();
+        $this->variants = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -308,6 +322,60 @@ class Product
     {
         if ($this->reviews->removeElement($review) && $review->getProduct() === $this) {
             $review->setProduct(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProductAttribute>
+     */
+    public function getAttributes(): Collection
+    {
+        return $this->attributes;
+    }
+
+    public function addAttribute(ProductAttribute $attribute): self
+    {
+        if (!$this->attributes->contains($attribute)) {
+            $this->attributes->add($attribute);
+            $attribute->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAttribute(ProductAttribute $attribute): self
+    {
+        if ($this->attributes->removeElement($attribute) && $attribute->getProduct() === $this) {
+            $attribute->setProduct(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProductVariant>
+     */
+    public function getVariants(): Collection
+    {
+        return $this->variants;
+    }
+
+    public function addVariant(ProductVariant $variant): self
+    {
+        if (!$this->variants->contains($variant)) {
+            $this->variants->add($variant);
+            $variant->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVariant(ProductVariant $variant): self
+    {
+        if ($this->variants->removeElement($variant) && $variant->getProduct() === $this) {
+            $variant->setProduct(null);
         }
 
         return $this;
