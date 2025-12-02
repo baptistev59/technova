@@ -38,14 +38,14 @@
     </div>
 </section>
 
-{# Carrousel simplifié des produits les plus consultés #}
+{# Carrousel simplifié des derniers produits #}
 <section class="tn-section">
     <div class="tn-section__header">
-        <h2>Produits populaires</h2>
+        <h2>Nouveautés</h2>
         <a href="{{ path('catalog_index') }}">Voir tout</a>
     </div>
     <div class="tn-products-grid">
-        {% for product in products %}
+        {% for product in latestProducts %}
             <article class="tn-product-card">
                 {% set mainImage = product.images|first %}
                 {% if mainImage %}
@@ -64,6 +64,36 @@
             </article>
         {% else %}
             <p>Aucun produit récent n'est disponible.</p>
+        {% endfor %}
+    </div>
+</section>
+
+{# Sélection "à la une" alimentée via isFeatured #}
+<section class="tn-section">
+    <div class="tn-section__header">
+        <h2>Produits à la une</h2>
+        <a href="{{ path('catalog_index', { sort: 'price_desc' }) }}">Découvrir la sélection</a>
+    </div>
+    <div class="tn-products-grid">
+        {% for product in featuredProducts %}
+            <article class="tn-product-card">
+                {% set mainImage = product.images|first %}
+                {% if mainImage %}
+                    <img src="{{ mainImage.url }}" alt="{{ mainImage.alt }}">
+                {% else %}
+                    <img src="{{ asset('assets/images/product-placeholder.svg') }}" alt="Visuel par défaut">
+                {% endif %}
+                <h3>{{ product.name }}</h3>
+                <div class="tn-product-card__meta">
+                    <span>{{ product.brand ? product.brand.name : product.shop.name }}</span>
+                    <strong>{{ product.price|number_format(2, ',', ' ') }} €</strong>
+                </div>
+                <div class="tn-product-card__cta">
+                    <a class="btn btn-primary" href="{{ path('product_show', {slug: product.slug}) }}">Voir le produit</a>
+                </div>
+            </article>
+        {% else %}
+            <p>Aucun produit à la une pour le moment.</p>
         {% endfor %}
     </div>
 </section>

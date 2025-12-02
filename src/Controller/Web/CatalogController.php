@@ -22,13 +22,13 @@ class CatalogController extends AbstractController
         CategoryRepository $categoryRepository,
         BrandRepository $brandRepository
     ): Response {
-        $categorySlug = $request->query->get('category');
-        $brandSlug = $request->query->get('brand');
-
-        // On centralise les paramètres pour pouvoir les réafficher dans la vue
         $filters = [
-            'category' => $categorySlug,
-            'brand' => $brandSlug,
+            'category' => $request->query->get('category'),
+            'brand' => $request->query->get('brand'),
+            'minPrice' => $request->query->get('minPrice'),
+            'maxPrice' => $request->query->get('maxPrice'),
+            'search' => $request->query->get('search'),
+            'sort' => $request->query->get('sort'),
         ];
 
         // Le repository connaît déjà la logique de filtres → réutilisation côté API/Twig
@@ -41,6 +41,7 @@ class CatalogController extends AbstractController
             'categories' => $categories,
             'brands' => $brands,
             'activeFilters' => $filters,
+            'resultsCount' => count($products),
         ]);
     }
 }

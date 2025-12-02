@@ -6,29 +6,44 @@
 {# Entête catalogue : champs de recherche/tri #}
 <section class="tn-section">
     <h1>Catalogue produits</h1>
-    <div class="tn-filters">
-        <input type="text" placeholder="Rechercher un produit…">
+    <form class="tn-filters" method="get" action="{{ path('catalog_index') }}">
+        <input type="text" name="search" value="{{ activeFilters.search }}" placeholder="Rechercher un produit…">
         <div class="tn-select">
-            <select onchange="window.location=this.value">
-                <option value="{{ path('catalog_index', { brand: activeFilters.brand }) }}" {{ not activeFilters.category ? 'selected' }}>Catégorie</option>
+            <select name="category">
+                <option value="">Toutes les catégories</option>
                 {% for category in categories %}
-                    <option value="{{ path('catalog_index', { category: category.slug, brand: activeFilters.brand }) }}" {{ activeFilters.category == category.slug ? 'selected' }}>{{ category.name }}</option>
+                    <option value="{{ category.slug }}" {{ activeFilters.category == category.slug ? 'selected' }}>{{ category.name }}</option>
                 {% endfor %}
             </select>
         </div>
         <div class="tn-select">
-            <select onchange="window.location=this.value">
-                <option value="{{ path('catalog_index', { category: activeFilters.category }) }}" {{ not activeFilters.brand ? 'selected' }}>Marque</option>
+            <select name="brand">
+                <option value="">Toutes les marques</option>
                 {% for brand in brands %}
-                    <option value="{{ path('catalog_index', { category: activeFilters.category, brand: brand.slug }) }}" {{ activeFilters.brand == brand.slug ? 'selected' }}>{{ brand.name }}</option>
+                    <option value="{{ brand.slug }}" {{ activeFilters.brand == brand.slug ? 'selected' }}>{{ brand.name }}</option>
                 {% endfor %}
             </select>
         </div>
-    </div>
+        <input type="number" name="minPrice" value="{{ activeFilters.minPrice }}" min="0" step="50" placeholder="Prix min (€)">
+        <input type="number" name="maxPrice" value="{{ activeFilters.maxPrice }}" min="0" step="50" placeholder="Prix max (€)">
+        <div class="tn-select">
+            <select name="sort">
+                <option value="newest" {{ activeFilters.sort == 'newest' or not activeFilters.sort ? 'selected' }}>Plus récents</option>
+                <option value="oldest" {{ activeFilters.sort == 'oldest' ? 'selected' }}>Plus anciens</option>
+                <option value="price_asc" {{ activeFilters.sort == 'price_asc' ? 'selected' }}>Prix croissant</option>
+                <option value="price_desc" {{ activeFilters.sort == 'price_desc' ? 'selected' }}>Prix décroissant</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Filtrer</button>
+        <a class="btn btn-outline" href="{{ path('catalog_index') }}">Réinitialiser</a>
+    </form>
 </section>
 
 {# Grille principale du catalogue #}
 <section class="tn-section">
+    <div class="tn-section__header">
+        <h2>{{ resultsCount }} produit{{ resultsCount > 1 ? 's' }}</h2>
+    </div>
     <div class="tn-products-grid">
         {% for product in products %}
             <article class="tn-product-card">

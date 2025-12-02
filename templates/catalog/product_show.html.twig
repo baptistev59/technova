@@ -46,10 +46,38 @@
     </div>
     <div class="tn-product-specs">
         <ul>
-            <li>Garantie : 2 ans</li>
-            <li>Poids : 1,2 kg</li>
-            <li>SKU : {{ product.sku ?: 'N/A' }}</li>
+            {% for label, value in specifications %}
+                <li>
+                    <strong>{{ label }}</strong><br>
+                    {{ value }}
+                </li>
+            {% endfor %}
         </ul>
+    </div>
+</section>
+
+{# Options (couleurs, variantes) #}
+<section class="tn-section">
+    <div class="tn-section__header">
+        <h2>Options disponibles</h2>
+    </div>
+    <div class="tn-options">
+        <div>
+            <h3>Couleurs</h3>
+            <div class="tn-chips">
+                {% for color in options.colors %}
+                    <span>{{ color }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        <div>
+            <h3>Variantes</h3>
+            <div class="tn-chips">
+                {% for variant in options.variants %}
+                    <span>{{ variant }}</span>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 </section>
 

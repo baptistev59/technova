@@ -1017,10 +1017,35 @@ img {
 }
 
 .tn-product-specs li {
-  background: var(--tn-surface);
-  border-radius: 12px;
-  padding: .9rem 1rem;
-  border: 1px solid var(--tn-border);
+    background: var(--tn-surface);
+    border-radius: 12px;
+    padding: .9rem 1rem;
+    border: 1px solid var(--tn-border);
+}
+
+.tn-options {
+    background: var(--tn-surface);
+    border-radius: var(--tn-radius);
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    box-shadow: var(--tn-shadow);
+}
+
+.tn-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem;
+}
+
+.tn-chips span {
+    padding: .4rem .9rem;
+    border-radius: 999px;
+    background: rgba(30, 136, 229, .12);
+    color: var(--tn-primary);
+    font-weight: 600;
+    font-size: .9rem;
 }
 
 .tn-reviews {

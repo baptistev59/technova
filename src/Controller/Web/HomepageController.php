@@ -19,12 +19,14 @@ class HomepageController extends AbstractController
         CategoryRepository $categoryRepository
     ): Response {
         // Derniers produits mis en avant (fixtures)
-        $latestProducts = $productRepository->findLatestPublished(6);
+        $latestProducts = $productRepository->findLatestPublished(3);
+        $featuredProducts = $productRepository->findFeaturedPublished(3);
         // Quelques catégories pour alimenter les cartes
         $popularCategories = $categoryRepository->findBy([], ['name' => 'ASC'], 6);
 
         return $this->render('catalog/homepage.html.twig', [
-            'products' => $latestProducts,
+            'latestProducts' => $latestProducts,
+            'featuredProducts' => $featuredProducts,
             'categories' => $popularCategories,
         ]);
     }
