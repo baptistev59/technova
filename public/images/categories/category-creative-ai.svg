@@ -1,0 +1,6 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <rect x="8" y="8" width="184" height="184" rx="32" fill="#F5F6FA"/>
+  <rect x="60" y="80" width="80" height="80" rx="20" fill="#CE93D8"/>
+  <circle cx="100" cy="120" r="18" fill="#4A148C"/>
+  <text x="50%" y="182" text-anchor="middle" fill="#1f3b60" font-family="Inter, sans-serif" font-size="14">Création IA</text>
+</svg>

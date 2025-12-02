@@ -39,7 +39,7 @@ class Brand
     private ?string $description = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $logoUrl = null;
+    private ?string $logoPath = null;
 
     public function getId(): ?int
     {
@@ -82,14 +82,14 @@ class Brand
         return $this;
     }
 
-    public function getLogoUrl(): ?string
+    public function getLogoPath(): ?string
     {
-        return $this->logoUrl;
+        return $this->logoPath;
     }
 
-    public function setLogoUrl(?string $logoUrl): self
+    public function setLogoPath(?string $logoPath): self
     {
-        $this->logoUrl = $logoUrl;
+        $this->logoPath = $logoPath;
 
         return $this;
     }

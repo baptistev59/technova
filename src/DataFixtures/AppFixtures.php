@@ -19,6 +19,10 @@ use function random_int;
 class AppFixtures extends Fixture
 {
     private const IMAGE_BASE_PATH = '/images/products/';
+    private const CATEGORY_ICON_BASE_PATH = '/images/categories/';
+    private const AVATAR_BASE_PATH = '/images/avatars/';
+    private const ADMIN_AVATAR = self::AVATAR_BASE_PATH . 'avatar-admin.svg';
+    private const VENDOR_AVATAR = self::AVATAR_BASE_PATH . 'avatar-vendor.svg';
 
     public function __construct(
         private SluggerInterface $slugger,
@@ -45,7 +49,8 @@ class AppFixtures extends Fixture
             ->setEmail('admin@test.fr')
             ->setRoles(['ROLE_ADMIN'])
             ->setFirstname('Admin')
-            ->setLastname('TechNova');
+            ->setLastname('TechNova')
+            ->setAvatarPath(self::ADMIN_AVATAR);
 
         $admin->setPassword($this->passwordHasher->hashPassword($admin, '123456'));
 
@@ -65,7 +70,8 @@ class AppFixtures extends Fixture
             $category = (new Category())
                 ->setName($data['name'])
                 ->setSlug($data['slug'])
-                ->setDescription($data['description']);
+                ->setDescription($data['description'])
+                ->setIconPath($data['icon']);
 
             $manager->persist($category);
             $map[$data['slug']] = $category;
@@ -86,7 +92,7 @@ class AppFixtures extends Fixture
                 ->setName($data['name'])
                 ->setSlug($data['slug'])
                 ->setDescription($data['description'])
-                ->setLogoUrl($data['logo']);
+                ->setLogoPath($data['logo']);
 
             $manager->persist($brand);
             $map[$data['slug']] = $brand;
@@ -108,7 +114,8 @@ class AppFixtures extends Fixture
                 ->setEmail($data['owner']['email'])
                 ->setFirstname($data['owner']['firstname'])
                 ->setLastname($data['owner']['lastname'])
-                ->setRoles(['ROLE_VENDOR']);
+                ->setRoles(['ROLE_VENDOR'])
+                ->setAvatarPath(self::VENDOR_AVATAR);
 
             $owner->setPassword($this->passwordHasher->hashPassword($owner, $data['owner']['password']));
 
@@ -232,13 +239,48 @@ class AppFixtures extends Fixture
     private function getCategoryData(): array
     {
         return [
-            ['slug' => 'future-laptops', 'name' => 'Ordinateurs quantiques', 'description' => 'Stations portables mêlant IA embarquée et calcul quantique.'],
-            ['slug' => 'smart-mobility', 'name' => 'Mobilité électrique intelligente', 'description' => 'Trottinettes autonomes, vélos augmentés et drones cargo.'],
-            ['slug' => 'immersive-vr', 'name' => 'Réalité mixte & holographie', 'description' => 'Casques XR et projecteurs holographiques pour travailler différemment.'],
-            ['slug' => 'bio-wearables', 'name' => 'Wearables biométriques', 'description' => 'Anneaux, bracelets et textiles mesurant en continu la santé.'],
-            ['slug' => 'smart-home', 'name' => 'Maison autonome', 'description' => 'Domotique premium, sécurité IA et gestion énergétique.'],
-            ['slug' => 'creative-ai', 'name' => 'Audio & création assistée', 'description' => 'Enceintes contextuelles, instruments et assistants créatifs.'],
-            ['slug' => 'personal-robotics', 'name' => 'Robots personnels', 'description' => 'Compagnons domestiques et robots d’assistance.'],
+            [
+                'slug' => 'future-laptops',
+                'name' => 'Ordinateurs quantiques',
+                'description' => 'Stations portables mêlant IA embarquée et calcul quantique.',
+                'icon' => self::CATEGORY_ICON_BASE_PATH . 'category-future-laptops.svg',
+            ],
+            [
+                'slug' => 'smart-mobility',
+                'name' => 'Mobilité électrique intelligente',
+                'description' => 'Trottinettes autonomes, vélos augmentés et drones cargo.',
+                'icon' => self::CATEGORY_ICON_BASE_PATH . 'category-smart-mobility.svg',
+            ],
+            [
+                'slug' => 'immersive-vr',
+                'name' => 'Réalité mixte & holographie',
+                'description' => 'Casques XR et projecteurs holographiques pour travailler différemment.',
+                'icon' => self::CATEGORY_ICON_BASE_PATH . 'category-immersive-vr.svg',
+            ],
+            [
+                'slug' => 'bio-wearables',
+                'name' => 'Wearables biométriques',
+                'description' => 'Anneaux, bracelets et textiles mesurant en continu la santé.',
+                'icon' => self::CATEGORY_ICON_BASE_PATH . 'category-bio-wearables.svg',
+            ],
+            [
+                'slug' => 'smart-home',
+                'name' => 'Maison autonome',
+                'description' => 'Domotique premium, sécurité IA et gestion énergétique.',
+                'icon' => self::CATEGORY_ICON_BASE_PATH . 'category-smart-home.svg',
+            ],
+            [
+                'slug' => 'creative-ai',
+                'name' => 'Audio & création assistée',
+                'description' => 'Enceintes contextuelles, instruments et assistants créatifs.',
+                'icon' => self::CATEGORY_ICON_BASE_PATH . 'category-creative-ai.svg',
+            ],
+            [
+                'slug' => 'personal-robotics',
+                'name' => 'Robots personnels',
+                'description' => 'Compagnons domestiques et robots d’assistance.',
+                'icon' => self::CATEGORY_ICON_BASE_PATH . 'category-personal-robotics.svg',
+            ],
         ];
     }
 

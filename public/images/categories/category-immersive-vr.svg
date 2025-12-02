@@ -1,0 +1,8 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <rect x="8" y="8" width="184" height="184" rx="32" fill="#F5F6FA"/>
+  <rect x="45" y="80" width="110" height="60" rx="30" fill="#00BCD4"/>
+  <rect x="62" y="95" width="76" height="30" rx="15" fill="#004d61"/>
+  <circle cx="75" cy="110" r="12" fill="#9ff5ff"/>
+  <circle cx="125" cy="110" r="12" fill="#9ff5ff"/>
+  <text x="50%" y="182" text-anchor="middle" fill="#1f3b60" font-family="Inter, sans-serif" font-size="14">XR &amp; Hologramme</text>
+</svg>

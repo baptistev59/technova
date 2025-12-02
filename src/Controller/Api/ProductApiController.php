@@ -18,7 +18,7 @@ class ProductApiController extends AbstractController
     public function __construct(private ProductRepository $productRepository)
     {
     }
-
+    // Liste des produits publiés routed par /api/products
     #[Route('', name: 'api_products_index', methods: ['GET'])]
     public function index(): JsonResponse
     {
@@ -28,6 +28,7 @@ class ProductApiController extends AbstractController
         return $this->json(array_map([$this, 'serializeProduct'], $products));
     }
 
+    // Détail d'un produit publié routed par son slug. ex: /api/products/mon-produit
     #[Route('/{slug}', name: 'api_products_show', methods: ['GET'])]
     public function show(string $slug): JsonResponse
     {

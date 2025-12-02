@@ -44,7 +44,9 @@
                     <span>{{ product.brand ? product.brand.name : product.shop.name }}</span>
                     <strong>{{ product.price|number_format(2, ',', ' ') }} €</strong>
                 </div>
-                <a class="btn btn-primary" href="{{ path('product_show', {slug: product.slug}) }}">Voir le produit</a>
+                <div class="tn-product-card__cta">
+                    <a class="btn btn-primary" href="{{ path('product_show', {slug: product.slug}) }}">Voir le produit</a>
+                </div>
             </article>
         {% else %}
             <p>Aucun produit ne correspond à votre recherche.</p>

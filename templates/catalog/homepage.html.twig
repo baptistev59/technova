@@ -14,7 +14,7 @@
         </div>
     </div>
     <div class="tn-hero__visual">
-        <img src="{{ asset('assets/images/hero-innovation.svg') }}" alt="Innovation TechNova">
+        <img src="{{ asset('images/hero/hero-immersive-lab.svg') }}" alt="Innovation TechNova">
     </div>
 </section>
 
@@ -25,9 +25,10 @@
     </div>
     <div class="tn-categories">
         {% for category in categories %}
+            {% set iconPath = category.iconPath ?? 'images/categories/category-default.svg' %}
             <article class="tn-category-card">
                 <div class="tn-category-card__icon">
-                    <img src="{{ asset('assets/images/category-default.svg') }}" alt="Icône {{ category.name }}">
+                    <img src="{{ asset(iconPath) }}" alt="Icône {{ category.name }}">
                 </div>
                 <p>{{ category.name }}</p>
             </article>
@@ -57,7 +58,9 @@
                     <span>{{ product.brand ? product.brand.name : product.shop.name }}</span>
                     <strong>{{ product.price|number_format(2, ',', ' ') }} €</strong>
                 </div>
-                <a class="btn btn-primary" href="{{ path('product_show', {slug: product.slug}) }}">Voir le produit</a>
+                <div class="tn-product-card__cta">
+                    <a class="btn btn-primary" href="{{ path('product_show', {slug: product.slug}) }}">Voir le produit</a>
+                </div>
             </article>
         {% else %}
             <p>Aucun produit récent n'est disponible.</p>

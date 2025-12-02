@@ -27,6 +27,9 @@ class Category
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $iconPath = null;
+
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'children')]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     private ?self $parent = null;
@@ -86,6 +89,18 @@ class Category
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getIconPath(): ?string
+    {
+        return $this->iconPath;
+    }
+
+    public function setIconPath(?string $iconPath): static
+    {
+        $this->iconPath = $iconPath;
 
         return $this;
     }

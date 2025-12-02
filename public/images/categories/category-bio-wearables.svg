@@ -1,0 +1,6 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <rect x="8" y="8" width="184" height="184" rx="32" fill="#F5F6FA"/>
+  <circle cx="100" cy="100" r="56" stroke="#FF7043" stroke-width="18" fill="none"/>
+  <circle cx="100" cy="100" r="26" stroke="#FFAB91" stroke-width="6" fill="none"/>
+  <text x="50%" y="182" text-anchor="middle" fill="#1f3b60" font-family="Inter, sans-serif" font-size="14">Wearables</text>
+</svg>

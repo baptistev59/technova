@@ -139,6 +139,7 @@ Scripts utiles
 - `php bin/console doctrine:fixtures:load` – (quand des fixtures seront ajoutées).
 - `php bin/console make:migration` – Génère les migrations lors des évolutions du schéma.
 - `php bin/console cache:clear --env=prod --no-warmup` – À utiliser après toute modification de config en prod.
+- `npm run optimize-images` – Convertit les images `public/images/**/*.{png,jpg}` en WebP via `sharp` (utile avant un push pour réduire le poids des médias).
 
 Bonnes pratiques / sécurité
 ---------------------------
