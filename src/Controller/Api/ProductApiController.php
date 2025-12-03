@@ -41,7 +41,7 @@ class ProductApiController extends AbstractController
                 description: 'Liste de produits',
                 content: new OA\JsonContent(
                     type: 'array',
-                    items: new OA\Schema(
+                    items: new OA\Items(
                         type: 'object',
                         properties: [
                             new OA\Property(property: 'name', type: 'string'),

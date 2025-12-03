@@ -37,8 +37,11 @@ Endpoints disponibles
 | GET     | `/api/test-audit`    | Génère une entrée dans `audit_log`.                     | JWT |
 | GET     | `/api/me`            | Infos du user connecté (id/email).                      | JWT |
 | POST    | `/api/login`         | Authentifie via email/password, renvoie JWT.            | Publique |
+| POST    | `/api/register`      | Inscription client + JWT de bienvenue.                  | Publique |
+| POST    | `/api/token/refresh` | Régénère un JWT à partir du token courant.              | JWT |
 | GET     | `/api/products`      | Liste JSON des produits publiés (filtres catégorie/marque/prix/texte + tri). | Publique |
 | GET     | `/api/products/{slug}` | Fiche produit détaillée (prix, variantes, images, avis).         | Publique |
+| GET     | `/api/docs`          | Swagger UI (documentation interactive).                 | Publique (à protéger en prod) |
 
 **Query params utiles (`/api/products`)**
 
@@ -49,7 +52,6 @@ Endpoints disponibles
 | `minPrice` / `maxPrice` | `minPrice=500&maxPrice=2500` | Fourchette de prix (euros) |
 | `search` | `quantum` | Recherche plein texte dans le nom / résumé |
 | `sort` | `price_desc` | `newest`, `oldest`, `price_asc`, `price_desc` |
-| GET     | `/api/docs`          | Swagger UI (documentation interactive).                 | Publique (à protéger en prod) |
 
 Pages Twig (catalogue)
 ----------------------
@@ -76,6 +78,7 @@ symfony serve -d               # ou php -S localhost:8000 -t public
 
 Authentification JWT & Postman
 ------------------------------
+### Login
 1. `POST /api/login` avec JSON :
    ```json
    { "email": "user@example.com", "password": "password" }
@@ -90,6 +93,23 @@ Authentification JWT & Postman
    pm.collectionVariables.set("jwt_token", data.token);
    ```
 4. Dans vos requêtes protégées, utilisez l’en‑tête `Authorization: Bearer {{jwt_token}}`.
+
+### Inscription client
+`POST /api/register` accepte :
+```json
+{
+  "email": "client@test.fr",
+  "password": "P@ssword123",
+  "firstname": "Alex",
+  "lastname": "Martin"
+}
+```
+La réponse retourne directement un token et les informations du compte créé, ce qui permet de connecter l’utilisateur immédiatement après son inscription.
+
+### Garder la session ouverte
+- Les tokens expirent après `JWT_TOKEN_TTL` secondes (3600 s par défaut, configurable via l’ENV).
+- Appelez `POST /api/token/refresh` avec le JWT actuel pour en obtenir un nouveau (`{ "token": "...", "expiresIn": 3600 }`).  
+- Le front peut automatiser cette requête pour prolonger la session tant que l’utilisateur est actif.
 
 Documentation API (Swagger)
 ---------------------------
@@ -111,6 +131,7 @@ Déploiement Alwaysdata (prod)
    JWT_SECRET_KEY=%kernel.project_dir%/config/jwt/private.pem
    JWT_PUBLIC_KEY=%kernel.project_dir%/config/jwt/public.pem
    JWT_PASSPHRASE=<même valeur que celle utilisée pour lexik:jwt:generate-keypair>
+   JWT_TOKEN_TTL=3600
    CORS_ALLOW_ORIGIN=https://technova.alwaysdata.net
    MAILER_DSN=null://null
    MESSENGER_TRANSPORT_DSN=doctrine://default?auto_setup=0

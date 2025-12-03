@@ -8,8 +8,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+    <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
 </head>
 <body>
+    {% set viewer = viewer_user() %}
     <header class="tn-header">
         <div class="tn-topbar">
             {# En-tête principal disponible sur toutes les pages #}
@@ -25,20 +27,55 @@
                 <input type="text" placeholder="Rechercher un produit…">
             </div>
             <div class="tn-auth">
-                <a class="btn btn-outline" href="#">Connexion</a>
-                <a class="btn btn-primary" href="#">S’inscrire</a>
+                {% if viewer %}
+                    {% set first_initial = (viewer.firstname ?? 'T')|slice(0, 1) %}
+                    {% set last_initial = (viewer.lastname ?? 'N')|slice(0, 1) %}
+                    {% set initials = (first_initial ~ last_initial)|upper %}
+                    <details class="tn-user-menu">
+                        <summary class="tn-user-menu__trigger">
+                            <span class="tn-user-avatar">
+                                {% if viewer.avatarPath %}
+                                    <img src="{{ asset(viewer.avatarPath) }}" alt="{{ viewer.firstname }}">
+                                {% else %}
+                                    {{ initials }}
+                                {% endif %}
+                            </span>
+                            <span class="tn-user-name">{{ viewer.firstname }}</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="tn-user-chevron" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.252l3.71-4.02a.75.75 0 111.08 1.04l-4.25 4.61a.75.75 0 01-1.08 0l-4.25-4.61a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                            </svg>
+                        </summary>
+                        <div class="tn-user-menu__panel">
+                            <a class="tn-user-menu__item" href="{{ path('app_profile') }}">Mon profil</a>
+                            <form method="post" action="{{ path('app_logout_web') }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('logout_web') }}">
+                                <button type="submit" class="tn-user-menu__item btn-link">Déconnexion</button>
+                            </form>
+                        </div>
+                    </details>
+                {% else %}
+                    <a class="btn btn-outline" href="{{ path('app_login') }}">Connexion</a>
+                    <a class="btn btn-primary" href="{{ path('app_register') }}">S’inscrire</a>
+                {% endif %}
             </div>
         </div>
     </header>
 
     <main class="tn-main">
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="mb-4 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-2 text-blue-800">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endfor %}
         {% block body %}{% endblock %}
     </main>
 
     <footer class="tn-footer">
         <div class="tn-footer__brand">
             <div class="tn-logo">
-                <img class="tn-logo-img" src="{{ asset('assets/images/logo-technova.svg') }}" alt="TechNova">
+                <img class="tn-logo-img" src="{{ asset('images/branding/logo-technova.png') }}" alt="TechNova">
                 <div>
                     <strong>TechNova</strong>
                     <small>Trouvez les meilleurs produits tech.</small>

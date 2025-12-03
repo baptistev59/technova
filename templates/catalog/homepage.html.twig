@@ -26,12 +26,12 @@
     <div class="tn-categories">
         {% for category in categories %}
             {% set iconPath = category.iconPath ?? 'images/categories/category-default.svg' %}
-            <article class="tn-category-card">
+            <a class="tn-category-card" href="{{ path('catalog_index', { category: category.slug }) }}">
                 <div class="tn-category-card__icon">
                     <img src="{{ asset(iconPath) }}" alt="Icône {{ category.name }}">
                 </div>
                 <p>{{ category.name }}</p>
-            </article>
+            </a>
         {% else %}
             <p>Aucune catégorie disponible.</p>
         {% endfor %}

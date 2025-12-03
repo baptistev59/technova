@@ -48,6 +48,7 @@ security:
 
         # Login JWT → public
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/register, roles: PUBLIC_ACCESS }
 
         # Le reste de l'API nécessite un JWT
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }

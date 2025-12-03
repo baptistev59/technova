@@ -84,9 +84,15 @@
         <div class="tn-variants-list">
             {% for variant in variantData %}
                 <article>
+                    {% set metadataValues = [] %}
+                    {% if variant.metadata %}
+                        {% for key, value in variant.metadata %}
+                            {% set metadataValues = metadataValues|merge([value]) %}
+                        {% endfor %}
+                    {% endif %}
                     <strong>
-                        {% if variant.metadata %}
-                            {{ variant.metadata|values|join(' • ') }}
+                        {% if metadataValues is not empty %}
+                            {{ metadataValues|join(' • ') }}
                         {% else %}
                             Configuration standard
                         {% endif %}

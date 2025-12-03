@@ -1,0 +1,10 @@
+{% block form_row %}
+    {% set row_classes = (row_attr.class|default('') ~ ' flex flex-col gap-1 text-left')|trim %}
+    {% set label_classes = (label_attr.class|default('') ~ ' text-sm font-semibold text-slate-600')|trim %}
+    {% set widget_classes = (attr.class|default('') ~ ' w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 shadow-sm transition focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400')|trim %}
+    <div class="{{ row_classes }}">
+        {{- form_label(form, null, { label_attr: label_attr|merge({ class: label_classes }) }) -}}
+        {{- form_widget(form, { attr: attr|merge({ class: widget_classes }) }) -}}
+        {{- form_errors(form) -}}
+    </div>
+{% endblock %}

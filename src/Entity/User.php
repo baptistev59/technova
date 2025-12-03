@@ -51,6 +51,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $phone = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $newsletterOptIn = false;
+
      /**
      * @var Collection<int, address>
      */
@@ -197,6 +200,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setAvatarPath(?string $avatarPath): static
     {
         $this->avatarPath = $avatarPath;
+
+        return $this;
+    }
+
+    public function isNewsletterOptIn(): bool
+    {
+        return $this->newsletterOptIn;
+    }
+
+    public function setNewsletterOptIn(bool $newsletterOptIn): static
+    {
+        $this->newsletterOptIn = $newsletterOptIn;
 
         return $this;
     }
