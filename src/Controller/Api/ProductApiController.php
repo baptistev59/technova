@@ -44,6 +44,7 @@ class ProductApiController extends AbstractController
                     items: new OA\Items(
                         type: 'object',
                         properties: [
+                            new OA\Property(property: 'id', type: 'integer'),
                             new OA\Property(property: 'name', type: 'string'),
                             new OA\Property(property: 'slug', type: 'string'),
                             new OA\Property(property: 'shortDescription', type: 'string', nullable: true),
@@ -88,6 +89,7 @@ class ProductApiController extends AbstractController
                 content: new OA\JsonContent(
                     type: 'object',
                     properties: [
+                        new OA\Property(property: 'id', type: 'integer'),
                         new OA\Property(property: 'name', type: 'string'),
                         new OA\Property(property: 'slug', type: 'string'),
                         new OA\Property(property: 'shortDescription', type: 'string', nullable: true),
@@ -166,6 +168,7 @@ class ProductApiController extends AbstractController
     private function serializeProduct(Product $product, bool $includeDetails = false): array
     {
         $data = [
+            'id' => $product->getId(),
             'name' => $product->getName(),
             'slug' => $product->getSlug(),
             'shortDescription' => $product->getShortDescription(),

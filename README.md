@@ -191,6 +191,7 @@ Scripts utiles
 - `php bin/console make:migration` – Génère les migrations lors des évolutions du schéma.
 - `php bin/console cache:clear --env=prod --no-warmup` – À utiliser après toute modification de config en prod.
 - `npm run optimize-images` – Convertit les images `public/images/**/*.{png,jpg}` en WebP via `sharp` (utile avant un push pour réduire le poids des médias).
+- `bash scripts/api-smoke.sh https://technova.alwaysdata.net` – Smoke-test API (curl + jq requis, URL optionnelle).
 
 Tests automatisés
 -----------------
@@ -204,6 +205,18 @@ Tests automatisés
   vendor\bin\phpunit.bat      # Windows
   ```
   La configuration est centralisée dans `phpunit.dist.xml` et la bootstrap `tests/bootstrap.php` charge l’autoloader + `.env`.
+
+Tests API (Newman/Postman)
+--------------------------
+- Les scénarios sont décrits dans `postman/technova-api.postman_collection.json` + l’environnement `postman/local.postman_environment.json`.  
+- On peut les éditer via Postman si besoin, mais l’exécution se fait désormais exclusivement via Newman (CLI).  
+- Avant lancement : renseignez `baseUrl`, `loginEmail` et `loginPassword`. La requête catalogue se charge de remplir `sampleProductSlug` et `cartProductId` avec un produit publié.
+- Commande standard :
+  ```bash
+  ./scripts/postman-tests.sh                                    # utilise newman global si dispo
+  ./scripts/postman-tests.sh <collection> <env> --reporters cli  # options avancées
+  ```
+  Le script choisit automatiquement `newman` (global) ou `npx --yes newman` en fallback.
 
 Bonnes pratiques / sécurité
 ---------------------------

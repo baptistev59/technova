@@ -70,3 +70,16 @@ php bin/console app:create-admin --env=prod
 - Les variables d’environnement restent gérées par Alwaysdata (plus de `.env.local.php` généré par le workflow).
 
 > Pense à enrichir ce fichier dès que tu réalises une nouvelle opération (tests, corrections, incidents). Ce sera ta trace pour la soutenance.
+
+## 7. Synchroniser rapidement la base Alwaysdata avec la base locale
+- Un script utilitaire `scripts/sync-demo-db.sh` est disponible : il exporte la base locale, transfère le dump via SCP et le restaure sur Alwaysdata.
+- Variables à définir avant exécution (via `export` ou en modifiant le script) :
+  - `LOCAL_DB_NAME`, `LOCAL_DB_USER`, `LOCAL_DB_HOST`
+  - `REMOTE_SSH` (ex. `technova@ssh1.alwaysdata.net`), `REMOTE_DB_NAME`, `REMOTE_DB_USER`, `REMOTE_DB_HOST`
+  - `REMOTE_DB_PASSWORD` (utilisé via `PGPASSWORD` côté serveur)
+- Exemple :
+  ```bash
+  export REMOTE_DB_PASSWORD="***"
+  bash scripts/sync-demo-db.sh
+  ```
+- Cette approche remplace le `doctrine:fixtures:load` côté Alwaysdata (trop destructif à cause des FK). On rafraîchit ponctuellement la démo en important la base locale, puis on laisse la prod vivre.
