@@ -6,6 +6,7 @@ use App\Entity\Address;
 use App\Entity\User;
 use App\Form\ProfileType;
 use App\Repository\UserRepository;
+use App\Security\ViewerAccessChecker;
 use App\Service\UserProfileService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -20,13 +21,18 @@ class ProfileController extends AbstractController
     public function __construct(
         private readonly Security $security,
         private readonly UserRepository $userRepository,
-        private readonly UserProfileService $profileService
+        private readonly UserProfileService $profileService,
+        private readonly ViewerAccessChecker $viewerAccessChecker
     ) {
     }
 
     #[Route('/mon-compte/profil', name: 'app_profile', methods: ['GET', 'POST'])]
     public function __invoke(Request $request): Response
     {
+        if ($response = $this->viewerAccessChecker->requireViewer($this->getUser(), $request->getSession())) {
+            return $response;
+        }
+
         $user = $this->resolveViewer($request);
         if (!$user instanceof User) {
             $this->addFlash('info', 'Crée un compte ou connecte-toi pour accéder au profil.');

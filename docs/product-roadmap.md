@@ -35,3 +35,10 @@ Ce fichier liste les pistes d’évolution concernant la gestion des produits. C
 ## 8. Images & optimisation
 - Service d’optimisation (WebP/AVIF) + génération multi-résolution via `sharp` ou un worker.
 - Possibilité d’associer une image spécifique à chaque variante.
+
+## 9. Authentification front & session
+- Déléguer les formulaires Twig (`/connexion`, `/inscription`) à `POST /api/login` / `/api/register` afin d’unifier le workflow.
+- Persister le JWT côté navigateur (session/local storage) et automatiser `POST /api/token/refresh`.
+- Créer un authenticator Symfony pour mettre à disposition les rôles (`Security`) au lieu d’un simple `viewer_user()`.
+- Ajouter une vraie gestion de session (logout côté API, expiration du jeton, rotation).
+- Prévoir un stockage sécurisé du token côté React (future SPA) pour réutiliser la même base.

@@ -45,7 +45,7 @@ class LoginController extends AbstractController
 
                 $this->addFlash('success', 'Bon retour parmi nous !');
 
-                return $this->redirectToRoute('app_profile');
+                return $this->redirectToRoute('homepage');
             }
         }
 
@@ -55,4 +55,3 @@ class LoginController extends AbstractController
         ]);
     }
 }
-

@@ -25,6 +25,9 @@ class LoginAuditSubscriber implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * Trace chaque succès de connexion pour alimenter l'audit.
+     */
     public function onLoginSuccess(LoginSuccessEvent $event): void
     {
         /** @var User|null $user */
@@ -48,18 +51,21 @@ class LoginAuditSubscriber implements EventSubscriberInterface
         );
     }
 
+    /**
+     * Capture les tentatives échouées pour surveiller les attaques/bruteforce.
+     */
     public function onLoginFailure(AuthenticationFailureEvent $event): void
     {
         $exception = $event->getException();
-        $payload = [];
+        $requestData = [];
         if ($request = $event->getRequest()) {
             try {
-                $payload = $request->toArray();
+                $requestData = $request->toArray();
             } catch (\Throwable) {
                 // toArray() peut lancer une exception si le body n'est pas JSON → on ignore
             }
         }
-        $email = $payload['email'] ?? null;
+        $email = $requestData['email'] ?? null;
 
         // Ici on n'a pas d'entité User mais on garde le login tenté + le message
         $this->audit->log(

@@ -37,7 +37,7 @@
                             {% if viewer is defined and viewer and viewer.avatarPath %}
                                 {% set avatarUrl = viewer.avatarPath starts with 'http' ? viewer.avatarPath : asset(viewer.avatarPath) %}
                             {% endif %}
-                            <div class="h-20 w-20 rounded-full bg-white border border-slate-200 shadow-inner overflow-hidden flex items-center justify-center">
+                            <div class="h-20 w-20 rounded-full bg-white border border-slate-200 shadow-inner overflow-hidden flex items-center justify-center" data-avatar-preview>
                                 {% if avatarUrl %}
                                     <img src="{{ avatarUrl }}" alt="Avatar actuel" class="h-full w-full object-cover">
                                 {% else %}
@@ -137,4 +137,31 @@
         </div>
     </div>
 </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.querySelector('input[type="file"][name$="[avatarFile]"]');
+            const preview = document.querySelector('[data-avatar-preview]');
+
+            if (!fileInput || !preview) {
+                return;
+            }
+
+            fileInput.addEventListener('change', () => {
+                const [file] = fileInput.files ?? [];
+                if (!file) {
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = event => {
+                    preview.innerHTML = '<img src="' + event.target.result + '" alt="Nouvel avatar" class="h-full w-full object-cover">';
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+    </script>
 {% endblock %}

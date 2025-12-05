@@ -9,12 +9,18 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Formulaire web d'inscription classique.
+ */
 class RegistrationController extends AbstractController
 {
     public function __construct(private readonly UserRegistrationService $registrationService)
     {
     }
 
+    /**
+     * Affiche + traite le formulaire traditionnel.
+     */
     #[Route('/inscription', name: 'app_register', methods: ['GET', 'POST'])]
     public function register(Request $request): Response
     {
@@ -23,8 +29,8 @@ class RegistrationController extends AbstractController
 
         $errors = null;
         if ($form->isSubmitted() && $form->isValid()) {
-            $payload = $form->getData();
-            $result = $this->registrationService->register($payload);
+            $requestData = $form->getData();
+            $result = $this->registrationService->register($requestData);
 
             if (($result['status'] ?? Response::HTTP_INTERNAL_SERVER_ERROR) === Response::HTTP_CREATED) {
                 $this->addFlash('success', 'Bienvenue sur TechNova ! Le profil est prêt à être complété.');

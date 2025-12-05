@@ -160,6 +160,76 @@ img {
     gap: .75rem;
 }
 
+.tn-user-menu__trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.tn-user-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.tn-user-menu__panel {
+    position: absolute;
+    right: 0;
+    margin-top: .5rem;
+    background: var(--tn-surface);
+    border: 1px solid var(--tn-border);
+    border-radius: 16px;
+    padding: .5rem;
+    min-width: 180px;
+    box-shadow: var(--tn-shadow);
+    z-index: 40;
+}
+
+.tn-user-menu:not([open]) .tn-user-menu__panel {
+    display: none;
+}
+
+.tn-user-menu__item {
+    display: block;
+    width: 100%;
+    padding: .6rem .85rem;
+    border-radius: 12px;
+    font-weight: 500;
+    color: var(--tn-text);
+    text-align: left;
+}
+
+.tn-user-menu__item:hover {
+    background: rgba(100, 181, 246, .12);
+    color: var(--tn-primary);
+}
+
+.tn-user-avatar {
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #ECF2FF;
+    font-weight: 600;
+    overflow: hidden;
+}
+
+.tn-user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+}
+
+.tn-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
 /* -- Layout ---------------------------------------------------------------- */
 
 .tn-main {
@@ -534,4 +604,9 @@ img {
     .tn-auth {
         flex-direction: column;
     }
+}
+.tn-user-menu__item.btn-link {
+    padding: .6rem .85rem;
+    text-align: left;
+    display: block;
 }

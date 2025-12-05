@@ -3,7 +3,20 @@
 {% block title %}{{ product.name }} | TechNova{% endblock %}
 
 {% block body %}
+{% set viewer = viewer_user() %}
 {# Bloc principal affichant la galerie et les infos produit #}
+{% if app.request.query.get('cart_added') %}
+    <div class="mb-6 rounded-2xl border border-blue-200 bg-blue-50 p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
+            <p class="font-semibold text-slate-900">{{ product.name }} a bien été ajouté à votre panier.</p>
+            <p class="text-sm text-slate-600">Vous pouvez continuer vos achats ou finaliser votre commande.</p>
+        </div>
+        <div class="flex gap-2">
+            <a class="btn btn-outline" href="{{ path('catalog_index') }}">Continuer mes achats</a>
+            <a class="btn btn-primary" href="{{ path('app_cart_show') }}">Voir le panier</a>
+        </div>
+    </div>
+{% endif %}
 <section class="tn-product-layout">
     <div class="tn-product-gallery">
         {% set mainImage = product.images|first %}
@@ -25,7 +38,19 @@
         <h1>{{ product.name }}</h1>
         <p class="tn-product-info__price">{{ product.price|number_format(2, ',', ' ') }} €</p>
         <p>{{ product.description }}</p>
-        <a class="btn btn-primary" href="#">Ajouter au panier</a>
+        {% if viewer %}
+            <form class="tn-add-to-cart" method="post" action="{{ path('app_cart_add', {id: product.id}) }}">
+                <label class="sr-only" for="quantity">Quantité</label>
+                <input class="tn-input" id="quantity" name="quantity" type="number" min="1" max="{{ product.stock }}" value="1">
+                <input type="hidden" name="redirect_to" value="product">
+                <input type="hidden" name="product_slug" value="{{ product.slug }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('add_to_cart_' ~ product.id) }}">
+                <button class="btn btn-primary" type="submit">Ajouter au panier</button>
+            </form>
+        {% else %}
+            <p class="text-slate-600">Connectez-vous pour ajouter ce produit au panier.</p>
+            <a class="btn btn-outline" href="{{ path('app_login') }}">Connexion</a>
+        {% endif %}
         <div class="tn-product-meta">
             <div>
                 <strong>Marque</strong>

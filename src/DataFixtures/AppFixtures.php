@@ -26,6 +26,7 @@ class AppFixtures extends Fixture
     private const AVATAR_BASE_PATH = '/images/avatars/';
     private const ADMIN_AVATAR = self::AVATAR_BASE_PATH . 'avatar-admin.svg';
     private const VENDOR_AVATAR = self::AVATAR_BASE_PATH . 'avatar-vendor.svg';
+    private const CUSTOMER_AVATAR = self::AVATAR_BASE_PATH . 'avatar-vendor.svg';
 
     public function __construct(
         private SluggerInterface $slugger,
@@ -36,6 +37,7 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         $this->createAdmin($manager);
+        $this->createDemoCustomers($manager);
 
         $categories = $this->createCategories($manager);
         $brands = $this->createBrands($manager);
@@ -60,6 +62,28 @@ class AppFixtures extends Fixture
         $manager->persist($admin);
 
         return $admin;
+    }
+
+    private function createDemoCustomers(ObjectManager $manager): void
+    {
+        $customers = [
+            ['email' => 'lena.client@technova.test', 'firstname' => 'Lena', 'lastname' => 'Hamon', 'password' => 'Client#01'],
+            ['email' => 'maxime.client@technova.test', 'firstname' => 'Maxime', 'lastname' => 'Dubois', 'password' => 'Client#02'],
+            ['email' => 'nora.client@technova.test', 'firstname' => 'Nora', 'lastname' => 'Keller', 'password' => 'Client#03'],
+        ];
+
+        foreach ($customers as $data) {
+            $customer = (new User())
+                ->setEmail($data['email'])
+                ->setFirstname($data['firstname'])
+                ->setLastname($data['lastname'])
+                ->setRoles(['ROLE_USER'])
+                ->setAvatarPath(self::CUSTOMER_AVATAR);
+
+            $customer->setPassword($this->passwordHasher->hashPassword($customer, $data['password']));
+
+            $manager->persist($customer);
+        }
     }
 
     /**

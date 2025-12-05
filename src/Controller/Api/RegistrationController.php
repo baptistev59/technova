@@ -11,12 +11,18 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/api/register')]
+/**
+ * Endpoint JSON pour l'inscription côté front SPA / mobile.
+ */
 class RegistrationController extends AbstractController
 {
     public function __construct(private readonly UserRegistrationService $registrationService)
     {
     }
 
+    /**
+     * Crée un compte et renvoie un JWT utilisable immédiatement.
+     */
     #[Route('', name: 'api_register', methods: ['POST'])]
     #[OA\Post(
         summary: 'Inscription d’un client',
@@ -54,15 +60,15 @@ class RegistrationController extends AbstractController
                     ]
                 )
             ),
-            new OA\Response(response: 400, description: 'Payload invalide'),
+            new OA\Response(response: 400, description: 'Données invalides'),
             new OA\Response(response: 409, description: 'Email déjà utilisé'),
         ]
     )]
     public function register(Request $request): JsonResponse
     {
-        $payload = json_decode($request->getContent() ?: '[]', true) ?? [];
+        $requestData = json_decode($request->getContent() ?: '[]', true) ?? [];
 
-        $result = $this->registrationService->register($payload);
+        $result = $this->registrationService->register($requestData);
 
         if ($result['status'] !== Response::HTTP_CREATED) {
             return $this->json(

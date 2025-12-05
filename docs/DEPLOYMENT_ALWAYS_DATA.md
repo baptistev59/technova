@@ -20,7 +20,7 @@ Ce document synthétise toutes les manipulations réalisées pour préparer et d
   - `CORS_ALLOW_ORIGIN=https://technova.alwaysdata.net`
   - `MAILER_DSN=null://null`
   - `MESSENGER_TRANSPORT_DSN=doctrine://default?auto_setup=0`
-  - **À ajouter** : `DEFAULT_URI=https://technova.alwaysdata.net` (manquant lors du `cache:clear`, voir §4).
+  - `DEFAULT_URI=https://technova.alwaysdata.net`
 
 ## 3. Installation sur l’hébergement via SSH
 ```bash
@@ -34,7 +34,7 @@ php bin/console app:create-admin --env=prod
 ## 4. Incidents rencontrés & résolutions
 | Date | Commande | Symptôme | Résolution / Statut |
 |------|----------|----------|---------------------|
-| 29/11 | `composer install --no-dev --optimize-autoloader` | `Environment variable not found: "DEFAULT_URI"` + warning Doctrine `report_fields_where_declared` | Ajouter `DEFAULT_URI` dans les variables Alwaysdata (ex. `https://technova.alwaysdata.net`). Warning Doctrine simplement informatif. **À faire** tant que la variable n’est pas créée. |
+| 29/11 | `composer install --no-dev --optimize-autoloader` | `Environment variable not found: "DEFAULT_URI"` + warning Doctrine `report_fields_where_declared` | Ajouter `DEFAULT_URI` dans les variables Alwaysdata (ex. `https://technova.alwaysdata.net`). Warning Doctrine simplement informatif. |
 | 29/11 | `php bin/console lexik:jwt:generate-keypair` puis `--overwrite` | Message “Your keys already exist” lors de la première tentative | Résolu : exécution avec `--overwrite` a généré une nouvelle paire de clés sur Alwaysdata. |
 | 29/11 | `php bin/console doctrine:migrations:migrate --env=prod` | `The version "latest" couldn't be reached, there are no registered migrations.` | À investiguer après résolution de `DEFAULT_URI`. Vérifier que les fichiers du dossier `migrations/` sont bien déployés sur Alwaysdata (git pull), puis relancer la commande. |
 | 29/11 | `composer install --no-dev --optimize-autoloader` | `ClassNotFoundError` sur `DebugBundle` car le cache est vidé en mode `dev` alors que les dépendances `dev` sont absentes | Assurer que les commandes sont exécutées avec `APP_ENV=prod APP_DEBUG=0` (ex: `APP_ENV=prod APP_DEBUG=0 composer install ...`). |

@@ -9,6 +9,10 @@ use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
+/**
+ * Service dédié à l'inscription : transforme les données brutes du formulaire en entité User persistée.
+ */
+
 class UserRegistrationService
 {
     public function __construct(
@@ -20,7 +24,9 @@ class UserRegistrationService
     }
 
     /**
-     * @param array<string, string> $payload
+     * Enregistre un utilisateur à partir des données de requête validées.
+     *
+     * @param array<string, string> $requestData
      *
      * @return array{
      *     status: int,
@@ -28,9 +34,9 @@ class UserRegistrationService
      *     errors?: array<string, string>
      * }
      */
-    public function register(array $payload): array
+    public function register(array $requestData): array
     {
-        $errors = $this->validatePayload($payload);
+        $errors = $this->validateRequestData($requestData);
 
         if (!empty($errors)) {
             return [
@@ -39,7 +45,7 @@ class UserRegistrationService
             ];
         }
 
-        $email = strtolower(trim($payload['email']));
+        $email = strtolower(trim($requestData['email']));
 
         if ($this->userRepository->findOneBy(['email' => $email])) {
             return [
@@ -50,11 +56,11 @@ class UserRegistrationService
 
         $user = (new User())
             ->setEmail($email)
-            ->setFirstname(trim($payload['firstname']))
-            ->setLastname(trim($payload['lastname']))
-            ->setRoles([]);
+            ->setFirstname(trim($requestData['firstname']))
+            ->setLastname(trim($requestData['lastname']))
+            ->setRoles(['ROLE_USER']);
 
-        $hashedPassword = $this->passwordHasher->hashPassword($user, $payload['password']);
+        $hashedPassword = $this->passwordHasher->hashPassword($user, $requestData['password']);
         $user->setPassword($hashedPassword);
 
         $this->entityManager->persist($user);
@@ -77,33 +83,34 @@ class UserRegistrationService
     }
 
     /**
-     * @param array<string, string> $payload
+     * Vérifie les règles métiers minimales pour les données d'inscription.
+     *
+     * @param array<string, string> $requestData
      *
      * @return array<string, string>
      */
-    private function validatePayload(array $payload): array
+    private function validateRequestData(array $requestData): array
     {
         $errors = [];
 
-        $email = strtolower(trim($payload['email'] ?? ''));
+        $email = strtolower(trim($requestData['email'] ?? ''));
         if ('' === $email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $errors['email'] = 'Email invalide';
         }
 
-        $password = $payload['password'] ?? '';
+        $password = $requestData['password'] ?? '';
         if (strlen($password) < 8) {
             $errors['password'] = 'Le mot de passe doit contenir au moins 8 caractères.';
         }
 
-        if ('' === trim($payload['firstname'] ?? '')) {
+        if ('' === trim($requestData['firstname'] ?? '')) {
             $errors['firstname'] = 'Le prénom est obligatoire.';
         }
 
-        if ('' === trim($payload['lastname'] ?? '')) {
+        if ('' === trim($requestData['lastname'] ?? '')) {
             $errors['lastname'] = 'Le nom est obligatoire.';
         }
 
         return $errors;
     }
 }
-

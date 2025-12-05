@@ -38,6 +38,9 @@ Endpoints disponibles
 | GET     | `/api/me`            | Infos du user connecté (id/email).                      | JWT |
 | POST    | `/api/login`         | Authentifie via email/password, renvoie JWT.            | Publique |
 | POST    | `/api/register`      | Inscription client + JWT de bienvenue.                  | Publique |
+| GET     | `/api/cart`          | Contenu du panier stocké en session navigateur.         | JWT |
+| POST    | `/api/cart`          | Ajoute un produit (JSON `{ productId, quantity }`).     | JWT |
+| DELETE  | `/api/cart/{id}`     | Supprime un produit du panier.                          | JWT |
 | POST    | `/api/token/refresh` | Régénère un JWT à partir du token courant.              | JWT |
 | GET     | `/api/products`      | Liste JSON des produits publiés (filtres catégorie/marque/prix/texte + tri). | Publique |
 | GET     | `/api/products/{slug}` | Fiche produit détaillée (prix, variantes, images, avis).         | Publique |
@@ -58,6 +61,22 @@ Pages Twig (catalogue)
 - `/` : accueil + sections “Nouveautés” et “Produits à la une”.
 - `/catalogue` : listing avec filtres catégorie/marque/prix/texte + tri.
 - `/produit/{slug}` : fiche produit (images, caractéristiques, options, variantes).
+- `/panier` : récapitulatif du panier stocké côté session (ajout/suppression/vidage) — accès réservé aux clients connectés.
+
+Espace compte (Twig + API)
+--------------------------
+- `/inscription` : formulaire Tailwind qui appelle directement `POST /api/register`.  
+  Après validation l’utilisateur est automatiquement connecté (ID + JWT stockés en session) puis redirigé vers `/mon-compte/profil`.
+- `/connexion` : formulaire Symfony (`LoginType`) qui vérifie l’email/mot de passe côté serveur, crée un JWT via Lexik et mémorise l’utilisateur dans la session (`viewer_user()` côté Twig).  
+- `/mon-compte/profil` : page composée de deux formulaires (`ProfileType`, `AddressType`) pour compléter les informations personnelles, préférences marketing et adresse principale.  
+- `/api/profile` (GET/POST) : endpoints jumeaux utilisés par le front Twig, protégés par le firewall JWT.
+
+> 💡 Actuellement la “connexion” Twig reste volontairement légère : on ne passe pas par `Security`/`firewall` mais par une session dédiée (`recent_user_id`, `jwt_token`). Cela suffit pour afficher le menu utilisateur + préremplir le profil, mais ce n’est **pas** encore une authentification server-side complète (pas de remember-me ni de rôles persistés). Le renforcement prévu consiste à :
+> 1. Utiliser `/api/login` partout (Twig ou React) pour obtenir un JWT.
+> 2. Persister ce token côté navigateur (sessionStorage/localStorage) et le rafraîchir via `/api/token/refresh`.
+> 3. Créer un vrai “front authenticator” qui mappe le JWT vers le `Security` component pour profiter des rôles/ACL.
+>
+> Ces étapes sont listées dans `docs/product-roadmap.md` (section « Authentification front & session »).
 
 Installation locale (dev)
 -------------------------
@@ -107,7 +126,7 @@ Authentification JWT & Postman
 La réponse retourne directement un token et les informations du compte créé, ce qui permet de connecter l’utilisateur immédiatement après son inscription.
 
 ### Garder la session ouverte
-- Les tokens expirent après `JWT_TOKEN_TTL` secondes (3600 s par défaut, configurable via l’ENV).
+- Les tokens expirent après `JWT_TOKEN_TTL` secondes (par défaut 86400 s = 24 h, configurable via l’ENV).
 - Appelez `POST /api/token/refresh` avec le JWT actuel pour en obtenir un nouveau (`{ "token": "...", "expiresIn": 3600 }`).  
 - Le front peut automatiser cette requête pour prolonger la session tant que l’utilisateur est actif.
 
@@ -131,7 +150,7 @@ Déploiement Alwaysdata (prod)
    JWT_SECRET_KEY=%kernel.project_dir%/config/jwt/private.pem
    JWT_PUBLIC_KEY=%kernel.project_dir%/config/jwt/public.pem
    JWT_PASSPHRASE=<même valeur que celle utilisée pour lexik:jwt:generate-keypair>
-   JWT_TOKEN_TTL=3600
+   JWT_TOKEN_TTL=86400
    CORS_ALLOW_ORIGIN=https://technova.alwaysdata.net
    MAILER_DSN=null://null
    MESSENGER_TRANSPORT_DSN=doctrine://default?auto_setup=0
@@ -173,6 +192,19 @@ Scripts utiles
 - `php bin/console cache:clear --env=prod --no-warmup` – À utiliser après toute modification de config en prod.
 - `npm run optimize-images` – Convertit les images `public/images/**/*.{png,jpg}` en WebP via `sharp` (utile avant un push pour réduire le poids des médias).
 
+Tests automatisés
+-----------------
+- **Stack** : PHPUnit 11 + WebTestCase.  
+- **Couverture actuelle** :
+  - `tests/Unit/UserRegistrationServiceTest` vérifie la création de compte et la validation côté `UserRegistrationService`.
+  - `tests/Functional/TestApiControllerTest` boot le kernel et s’assure que `/api/test` répond correctement (JSON + statut 200).
+- **Exécution** :
+  ```bash
+  ./vendor/bin/phpunit        # Linux/WSL/macOS
+  vendor\bin\phpunit.bat      # Windows
+  ```
+  La configuration est centralisée dans `phpunit.dist.xml` et la bootstrap `tests/bootstrap.php` charge l’autoloader + `.env`.
+
 Bonnes pratiques / sécurité
 ---------------------------
 - Ne versionnez jamais `config/jwt/*.pem` ni `.env.local.php`.  
@@ -192,7 +224,9 @@ Design / UI
 
 Comptes de démo
 ---------------
-- Les fixtures injectent un admin et dix comptes vendeurs. Les identifiants/mots de passe sont listés dans `docs/fixtures-users.md`.
+- **Admin** : `admin@test.fr` / `123456`
+- **Vendeurs** : `vendor01@technova.test` → `vendor10@technova.test` / `Vendor#0X`
+- **Clients** : `lena.client@technova.test` / `Client#01`, `maxime.client@technova.test` / `Client#02`, `nora.client@technova.test` / `Client#03`
 
 🚀 Bon déploiement !
 --------------------
