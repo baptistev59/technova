@@ -49,11 +49,13 @@ class UserContextExtension extends AbstractExtension
         if ($session && $session->has('recent_user_id')) {
             $userId = $session->get('recent_user_id');
             if (is_numeric($userId)) {
-                return $this->userRepository->find((int) $userId);
+                $user = $this->userRepository->find((int) $userId);
+                if ($user instanceof User && !$user->isDeleted()) {
+                    return $user;
+                }
             }
         }
 
         return null;
     }
 }
-

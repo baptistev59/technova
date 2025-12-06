@@ -33,7 +33,7 @@ class LoginController extends AbstractController
             $data = $form->getData();
             $user = $this->userRepository->findOneBy(['email' => strtolower($data['email'])]);
 
-            if (!$user || !$this->passwordHasher->isPasswordValid($user, $data['password'])) {
+            if (!$user || $user->isDeleted() || !$this->passwordHasher->isPasswordValid($user, $data['password'])) {
                 $error = 'Identifiants invalides.';
             } else {
                 $token = $this->jwtManager->create($user);

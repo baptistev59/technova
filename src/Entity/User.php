@@ -49,6 +49,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $avatarPath = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $isDeleted = false;
+
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $phone = null;
 
@@ -208,6 +211,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setAvatarPath(?string $avatarPath): static
     {
         $this->avatarPath = $avatarPath;
+
+        return $this;
+    }
+
+    public function isDeleted(): bool
+    {
+        return $this->isDeleted;
+    }
+
+    public function setIsDeleted(bool $isDeleted): self
+    {
+        $this->isDeleted = $isDeleted;
 
         return $this;
     }

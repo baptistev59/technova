@@ -62,6 +62,8 @@ Pages Twig (catalogue)
 - `/catalogue` : listing avec filtres catégorie/marque/prix/texte + tri (soumission automatique au changement ou via Entrée).
 - `/panier` + `/commande` : panier interactif puis checkout récapitulatif avant création de la commande + page de succès.
 - `/mon-compte/commandes` : historique de commandes + détail par référence.
+- `/mon-compte/profil` : mise à jour des informations + suppression/anonymisation RGPD du compte.
+- Confirmation d’une commande déclenche un e-mail (HTML + texte) envoyé via le SMTP configuré (`MAILER_DSN`).
 - `/produit/{slug}` : fiche produit (images, caractéristiques, options, variantes).
 - `/panier` : récapitulatif du panier stocké côté session (ajout/suppression/vidage) — accès réservé aux clients connectés.
 
@@ -71,7 +73,7 @@ Espace compte (Twig + API)
   Après validation l’utilisateur est automatiquement connecté (ID + JWT stockés en session) puis redirigé vers `/mon-compte/profil`.
 - `/connexion` : formulaire Symfony (`LoginType`) qui vérifie l’email/mot de passe côté serveur, crée un JWT via Lexik et mémorise l’utilisateur dans la session (`viewer_user()` côté Twig).  
 - `/mon-compte/profil` : page composée de deux formulaires (`ProfileType`, `AddressType`) pour compléter les informations personnelles, préférences marketing et adresse principale.  
-- `/api/profile` (GET/POST) : endpoints jumeaux utilisés par le front Twig, protégés par le firewall JWT.
+- `/api/profile` (GET/POST/DELETE) : endpoints jumeaux utilisés par le front Twig, protégés par le firewall JWT (`DELETE` anonymise le compte).
 
 > 💡 Actuellement la “connexion” Twig reste volontairement légère : on ne passe pas par `Security`/`firewall` mais par une session dédiée (`recent_user_id`, `jwt_token`). Cela suffit pour afficher le menu utilisateur + préremplir le profil, mais ce n’est **pas** encore une authentification server-side complète (pas de remember-me ni de rôles persistés). Le renforcement prévu consiste à :
 > 1. Utiliser `/api/login` partout (Twig ou React) pour obtenir un JWT.
@@ -154,7 +156,8 @@ Déploiement Alwaysdata (prod)
    JWT_PASSPHRASE=<même valeur que celle utilisée pour lexik:jwt:generate-keypair>
    JWT_TOKEN_TTL=86400
    CORS_ALLOW_ORIGIN=https://technova.alwaysdata.net
-   MAILER_DSN=null://null
+  MAILER_DSN=smtp://technova@alwaysdata.net:Teqapexa59Alwaysdata800@smtp-technova.alwaysdata.net:587
+  MAILER_FROM="TechNova <technova@alwaysdata.net>"
    MESSENGER_TRANSPORT_DSN=doctrine://default?auto_setup=0
    DEFAULT_URI=https://technova.alwaysdata.net
    ```
@@ -228,6 +231,7 @@ Bonnes pratiques / sécurité
 - Swagger étant public, pensez à activer une protection HTTP Basic sur Alwaysdata.  
 - Monitorer `~/logs/php-*.log` sur Alwaysdata pour diagnostiquer les 500.  
 - Les endpoints `/api/test*` peuvent être désactivés en prod (feature flag) via un firewall si nécessaire.
+- **Droit à l’oubli** : via `/mon-compte/profil`, un utilisateur peut supprimer son compte. Les données sont anonymisées (`email deleted-xxxx@technova.local`, avatars effacés, adresses et paniers supprimés) et le champ `is_deleted` bloque toute reconnexion.
 
 Design / UI
 -----------

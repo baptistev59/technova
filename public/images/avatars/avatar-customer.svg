@@ -1,0 +1,13 @@
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="customerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff9a62"/>
+      <stop offset="100%" stop-color="#f0579b"/>
+    </linearGradient>
+  </defs>
+  <circle cx="60" cy="60" r="60" fill="url(#customerGradient)"/>
+  <circle cx="60" cy="52" r="22" fill="#fff4ec"/>
+  <circle cx="42" cy="46" r="6" fill="#ffb18c"/>
+  <circle cx="78" cy="46" r="6" fill="#ffb18c"/>
+  <path d="M35 92c6-12 18-20 25-20s19 8 25 20" fill="#fff1e8"/>
+</svg>

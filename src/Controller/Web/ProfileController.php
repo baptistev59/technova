@@ -8,6 +8,7 @@ use App\Form\ProfileType;
 use App\Repository\UserRepository;
 use App\Security\ViewerAccessChecker;
 use App\Service\UserProfileService;
+use App\Service\UserAnonymizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -22,7 +23,8 @@ class ProfileController extends AbstractController
         private readonly Security $security,
         private readonly UserRepository $userRepository,
         private readonly UserProfileService $profileService,
-        private readonly ViewerAccessChecker $viewerAccessChecker
+        private readonly ViewerAccessChecker $viewerAccessChecker,
+        private readonly UserAnonymizer $userAnonymizer
     ) {
     }
 
@@ -62,6 +64,35 @@ class ProfileController extends AbstractController
             'profileForm' => $form->createView(),
             'viewer' => $user,
         ]);
+    }
+
+    #[Route('/mon-compte/profil/supprimer', name: 'app_profile_delete', methods: ['POST'])]
+    public function deleteAccount(Request $request): Response
+    {
+        if ($response = $this->viewerAccessChecker->requireViewer($this->getUser(), $request->getSession())) {
+            return $response;
+        }
+
+        if (!$this->isCsrfTokenValid('profile_delete', (string) $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Jeton invalide.');
+        }
+
+        $user = $this->resolveViewer($request);
+        if (!$user instanceof User) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $this->userAnonymizer->anonymize($user);
+
+        $session = $request->getSession();
+        if ($session) {
+            $session->invalidate();
+        }
+        $this->security->logout(false);
+
+        $this->addFlash('success', 'Ton compte a été supprimé et anonymisé.');
+
+        return $this->redirectToRoute('homepage');
     }
 
     private function resolveViewer(Request $request): ?User

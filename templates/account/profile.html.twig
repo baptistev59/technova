@@ -112,6 +112,15 @@
                 </div>
 
                 {{ form_end(profileForm) }}
+
+                <div class="mt-10 rounded-3xl border border-red-100 bg-red-50/80 p-6">
+                    <h2 class="text-lg font-semibold text-red-900">Supprimer mon compte</h2>
+                    <p class="text-sm text-red-800 mt-2">Cette action supprime définitivement ton compte.</p>
+                    <form class="mt-4 flex justify-end" method="post" action="{{ path('app_profile_delete') }}" onsubmit="return confirm('Confirmer la suppression de ton compte ? Cette action est irréversible.');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('profile_delete') }}">
+                        <button type="submit" class="btn btn-outline text-red-700 border-red-200 hover:bg-red-600 hover:text-white">Supprimer mon compte</button>
+                    </form>
+                </div>
             </div>
 
             <aside class="rounded-3xl bg-sky-50/80 p-6 shadow-[0_35px_80px_rgba(51,132,255,0.18)] flex flex-col justify-between">

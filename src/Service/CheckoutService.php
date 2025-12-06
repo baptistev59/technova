@@ -16,7 +16,8 @@ class CheckoutService
 {
     public function __construct(
         private readonly CartService $cartService,
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
+        private readonly OrderMailer $orderMailer
     ) {
     }
 
@@ -52,6 +53,7 @@ class CheckoutService
         $this->entityManager->persist($order);
         $this->entityManager->flush();
 
+        $this->orderMailer->sendConfirmation($order);
         $this->cartService->clear();
 
         return $order;

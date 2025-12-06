@@ -1,0 +1,19 @@
+Merci pour votre commande TechNova (référence {{ order.reference }})
+==================================================================
+
+Total : {{ total|number_format(2, ',', ' ') }} €
+
+Articles :
+{% for item in items %}
+- {{ item.name }} — {{ item.quantity }} × {{ item.unitPrice|number_format(2, ',', ' ') }} € = {{ item.lineTotal|number_format(2, ',', ' ') }} €
+{% endfor %}
+
+Adresse de livraison :
+{{ address.addressLine1 }}
+{% if address.addressLine2 %}{{ address.addressLine2 }}{% endif %}
+{{ address.postalCode }} {{ address.city }}
+{{ address.country }}
+
+Consultez votre historique : {{ baseUrl ~ '/mon-compte/commandes/' ~ order.reference }}
+
+À bientôt sur TechNova !

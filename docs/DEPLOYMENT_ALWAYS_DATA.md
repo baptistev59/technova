@@ -10,15 +10,17 @@ Ce document synthétise toutes les manipulations réalisées pour préparer et d
 - Ajout d’un README bilingue dans `config/jwt/` rappelant d’exécuter `php bin/console lexik:jwt:generate-keypair`.
 
 ## 2. Configuration Alwaysdata – Variables d’environnement
-- Valeurs saisies via *Configuration → Variables d’environnement* :
+- Valeurs courantes (via *Configuration → Variables d’environnement*) :
   - `APP_ENV=prod`, `APP_DEBUG=0`
   - `APP_SECRET` = généré via `openssl rand -hex 32`
   - `DATABASE_URL=postgresql://technova:******@postgresql-technova.alwaysdata.net:5432/technova_api?serverVersion=16&charset=utf8`
   - `JWT_SECRET_KEY=%kernel.project_dir%/config/jwt/private.pem`
   - `JWT_PUBLIC_KEY=%kernel.project_dir%/config/jwt/public.pem`
-  - `JWT_PASSPHRASE` = seconde valeur `openssl rand -hex 32`
+  - `JWT_PASSPHRASE` = identique à la passphrase utilisée lors du `lexik:jwt:generate-keypair`
+  - `JWT_TOKEN_TTL=86400`
   - `CORS_ALLOW_ORIGIN=https://technova.alwaysdata.net`
-  - `MAILER_DSN=null://null`
+  - `MAILER_DSN=smtp://technova@alwaysdata.net:<motdepasse>@smtp-technova.alwaysdata.net:587`
+  - `MAILER_FROM="TechNova <technova@alwaysdata.net>"`
   - `MESSENGER_TRANSPORT_DSN=doctrine://default?auto_setup=0`
   - `DEFAULT_URI=https://technova.alwaysdata.net`
 
@@ -36,19 +38,24 @@ php bin/console app:create-admin --env=prod
 |------|----------|----------|---------------------|
 | 29/11 | `composer install --no-dev --optimize-autoloader` | `Environment variable not found: "DEFAULT_URI"` + warning Doctrine `report_fields_where_declared` | Ajouter `DEFAULT_URI` dans les variables Alwaysdata (ex. `https://technova.alwaysdata.net`). Warning Doctrine simplement informatif. |
 | 29/11 | `php bin/console lexik:jwt:generate-keypair` puis `--overwrite` | Message “Your keys already exist” lors de la première tentative | Résolu : exécution avec `--overwrite` a généré une nouvelle paire de clés sur Alwaysdata. |
-| 29/11 | `php bin/console doctrine:migrations:migrate --env=prod` | `The version "latest" couldn't be reached, there are no registered migrations.` | À investiguer après résolution de `DEFAULT_URI`. Vérifier que les fichiers du dossier `migrations/` sont bien déployés sur Alwaysdata (git pull), puis relancer la commande. |
-| 29/11 | `composer install --no-dev --optimize-autoloader` | `ClassNotFoundError` sur `DebugBundle` car le cache est vidé en mode `dev` alors que les dépendances `dev` sont absentes | Assurer que les commandes sont exécutées avec `APP_ENV=prod APP_DEBUG=0` (ex: `APP_ENV=prod APP_DEBUG=0 composer install ...`). |
-| 29/11 | `php bin/console doctrine:migrations:migrate --env=prod` | Connexion PostgreSQL vers `127.0.0.1:5432` refusée | Les variables Alwaysdata ne sont pas injectées dans la session SSH par défaut. Exporter les variables (ex. `export DATABASE_URL="postgresql://..."`) ou créer un `.env.local` sur le serveur avant d’exécuter les commandes. |
-| 29/11 | Création de `.env.local` sur Alwaysdata | Besoin de forcer APP_ENV=prod et le DSN Postgres Alwaysdata pour toutes les commandes CLI | Fichier ajouté manuellement sur le serveur avec `APP_ENV=prod`, `APP_DEBUG=0`, `DATABASE_URL=postgresql://technova:***@postgresql-technova.alwaysdata.net:5432/technova_api?...`, `DEFAULT_URI`, `MAILER_DSN`, `MESSENGER_TRANSPORT_DSN`, etc. |
-| 29/11 | `php bin/console doctrine:database:drop/create` | `permission denied to create database` | Alwaysdata interdit la création de base via CLI. Solution : créer/supprimer la base `technova_api` depuis le manager, puis relancer les commandes Symfony. |
-| 29/11 | `php bin/console doctrine:migrations:migrate --env=prod` (après recréation via manager) | `relation "address" already exists` | Le schéma contenait encore les tables. Vider le schéma `public` depuis le manager (ou `DROP TABLE ... CASCADE`) avant de relancer la migration. Supprimer les migrations dupliquées côté serveur (ex. `Version20251128105214.php`). |
+| 29/11 | `php bin/console doctrine:migrations:migrate --env=prod` | `The version "latest" couldn't be reached, there are no registered migrations.` | Vérifier que les fichiers du dossier `migrations/` sont bien déployés (git pull) puis relancer la commande une fois `DEFAULT_URI` défini. |
+| 29/11 | `composer install --no-dev --optimize-autoloader` | `ClassNotFoundError` sur `DebugBundle` lorsque `APP_ENV` resté à `dev` | Lancer toutes les commandes avec `APP_ENV=prod APP_DEBUG=0` dans la même ligne (`APP_ENV=prod APP_DEBUG=0 composer install ...`). |
+| 29/11 | `php bin/console doctrine:migrations:migrate --env=prod` | Connexion PostgreSQL vers `127.0.0.1:5432` refusée | Les variables Alwaysdata ne sont pas injectées automatiquement en SSH. Exporter `DATABASE_URL` ou créer `.env.local` avant d’exécuter des commandes Doctrine. |
+| 29/11 | Création de `.env.local` sur Alwaysdata | Besoin de forcer les variables pour toutes les commandes CLI | Fichier ajouté sur le serveur avec `APP_ENV=prod`, `APP_DEBUG=0`, `DATABASE_URL=...`, `DEFAULT_URI`, `MAILER_DSN`, `MAILER_FROM`, `MESSENGER_TRANSPORT_DSN`, etc. |
+| 29/11 | `php bin/console doctrine:database:drop/create` | `permission denied to create database` | Alwaysdata interdit la création de base via CLI. Créer/supprimer la base depuis le manager puis relancer les commandes Symfony. |
+| 29/11 | `php bin/console doctrine:migrations:migrate --env=prod` (après recréation via manager) | `relation "address" already exists` | Le schéma contenait encore les tables. Vider le schéma `public` depuis le manager (ou `DROP TABLE ... CASCADE`) avant de relancer la migration. Supprimer les migrations dupliquées côté serveur. |
+| 05/12 | `php bin/console doctrine:migrations:migrate --no-interaction` | `Syntax error ... AUTO_INCREMENT` sur PostgreSQL lors de la création de `saved_cart` | Migration mise à jour pour utiliser `['autoincrement' => true]` (compatible Postgres). Après mise à jour du dépôt, relancer `composer dump-autoload` puis `doctrine:migrations:migrate`. |
+| 05/12 | `php bin/console doctrine:fixtures:load --purge-with-truncate` | Violations de FK (`address` ↔ `user`) sur la prod démo | Décision : ne plus exécuter les fixtures en prod. Utiliser désormais `scripts/sync-demo-db.sh` pour écraser la base Alwaysdata à partir du dump local lorsque nécessaire. |
+| 05/12 | `chmod -R g+rw var public/uploads` | `public/uploads` absent sur Alwaysdata | Créer le dossier (`mkdir -p public/uploads`) avant l’ajustement des droits. |
+| 05/12 | `npm run dev` (asset-map) | `Could not find package "catalog-filters" / syntax error controllers.json` | Vérifier `assets/controllers.json` après ajout d’une entrée Stimulus ; la tâche échoue en cas d’erreur JSON ou d’entrée inexistante. |
 
 ## 5. Prochaines actions
 1. **Variables** : déclarer `DEFAULT_URI=https://technova.alwaysdata.net` dans Alwaysdata, vérifier les valeurs d’`APP_SECRET` et `JWT_PASSPHRASE`.
 2. **Installation** : relancer `composer install --no-dev --optimize-autoloader` (devrait passer une fois la variable ajoutée).
 3. **Migrations** : le dossier `~/www/technova-backend/migrations/` est vide sur Alwaysdata (voir commande `ls migrations/`). Vérifier que les fichiers sont bien suivis en Git localement puis pousser/puller depuis le serveur (`git pull origin master`). Sur base neuve, nettoyer le schéma via le manager si des tables subsistent avant d’exécuter `php bin/console doctrine:migrations:migrate --no-interaction --env=prod`. Supprimer toute migration dupliquée directement sur le serveur.
 4. **Provisioning** : lancer `php bin/console app:create-admin --env=prod`. ✅ (admin `admin@test.fr` créé depuis Alwaysdata, commande validée le 29/11).
-5. **Tests** : valider `/api/test` et `/api/docs` sur `https://technova.alwaysdata.net` (protéger Swagger si nécessaire).
+5. **Tests** : valider `/api/test`, `/api/docs` et lancer le smoke-test Postman (`./scripts/postman-tests.sh --env prod.postman_environment.json`).  
+6. **Ne pas lancer `doctrine:fixtures:load` en prod** : privilégier le script de synchronisation pour recharger les données de démo (section 7).
 
 ## 6. GitHub Actions – `deploy-alwaysdata.yml`
 - Déclenchement : `push` sur `master`.  
@@ -71,15 +78,24 @@ php bin/console app:create-admin --env=prod
 
 > Pense à enrichir ce fichier dès que tu réalises une nouvelle opération (tests, corrections, incidents). Ce sera ta trace pour la soutenance.
 
-## 7. Synchroniser rapidement la base Alwaysdata avec la base locale
-- Un script utilitaire `scripts/sync-demo-db.sh` est disponible : il exporte la base locale, transfère le dump via SCP et le restaure sur Alwaysdata.
-- Variables à définir avant exécution (via `export` ou en modifiant le script) :
+## 7. Synchroniser la base Alwaysdata avec la base locale
+- Script utilitaire : `scripts/sync-demo-db.sh`. Il :
+  1. Dump la base locale (pg_dump).
+  2. Transfère le fichier via `scp` sur le serveur.
+  3. Restaure le dump dans `technova_api` (purge avec respect des FK).
+  4. Supprime le dump temporaire (local + distant).
+- Variables à définir (`export` ou modification du fichier) :
   - `LOCAL_DB_NAME`, `LOCAL_DB_USER`, `LOCAL_DB_HOST`
-  - `REMOTE_SSH` (ex. `technova@ssh1.alwaysdata.net`), `REMOTE_DB_NAME`, `REMOTE_DB_USER`, `REMOTE_DB_HOST`
-  - `REMOTE_DB_PASSWORD` (utilisé via `PGPASSWORD` côté serveur)
+  - `REMOTE_SSH` (ex. `technova@ssh-technova.alwaysdata.net`), `REMOTE_DB_NAME`, `REMOTE_DB_USER`, `REMOTE_DB_HOST`
+  - `REMOTE_DB_PASSWORD` (injecté dans `PGPASSWORD` lors de la restauration)
 - Exemple :
   ```bash
   export REMOTE_DB_PASSWORD="***"
   bash scripts/sync-demo-db.sh
   ```
-- Cette approche remplace le `doctrine:fixtures:load` côté Alwaysdata (trop destructif à cause des FK). On rafraîchit ponctuellement la démo en important la base locale, puis on laisse la prod vivre.
+- Cette méthode remplace `doctrine:fixtures:load` en prod : la base est réalimentée ponctuellement à partir du dump local puis laissée “vivre” pour la démo.
+
+## 8. Logs & monitoring
+- Depuis décembre 2025, le handler Monolog prod (`config/packages/monolog.yaml`) écrit dans un `rotating_file` (`var/log/prod.log`) conservant les 30 derniers fichiers (`max_files: 30`).
+- Les logs applicatifs restent accessibles via Alwaysdata (`~/logs/php-*.log`) mais cette rotation locale permet de télécharger rapidement un pack complet si besoin.
+- Les endpoints `/api/test` et `/api/test-audit` sont utiles pour vérifier que l’écriture des logs fonctionne après un déploiement.

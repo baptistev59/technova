@@ -177,7 +177,7 @@ class CartService
     private function resolveViewerUser(): ?User
     {
         $user = $this->security->getUser();
-        if ($user instanceof User) {
+        if ($user instanceof User && !$user->isDeleted()) {
             return $user;
         }
 
@@ -185,7 +185,10 @@ class CartService
         if ($session && $session->has('recent_user_id')) {
             $userId = (int) $session->get('recent_user_id');
             if ($userId > 0) {
-                return $this->userRepository->find($userId);
+                $resolved = $this->userRepository->find($userId);
+                if ($resolved instanceof User && !$resolved->isDeleted()) {
+                    return $resolved;
+                }
             }
         }
 

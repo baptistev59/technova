@@ -15,6 +15,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserRegistrationService
 {
+    private const DEFAULT_AVATAR = '/images/avatars/avatar-customer.svg';
+
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly UserRepository $userRepository,
@@ -58,7 +60,8 @@ class UserRegistrationService
             ->setEmail($email)
             ->setFirstname(trim($requestData['firstname']))
             ->setLastname(trim($requestData['lastname']))
-            ->setRoles(['ROLE_USER']);
+            ->setRoles(['ROLE_USER'])
+            ->setAvatarPath(self::DEFAULT_AVATAR);
 
         $hashedPassword = $this->passwordHasher->hashPassword($user, $requestData['password']);
         $user->setPassword($hashedPassword);

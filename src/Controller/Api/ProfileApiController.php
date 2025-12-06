@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\User;
+use App\Service\UserAnonymizer;
 use App\Service\UserProfileService;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,7 +24,8 @@ class ProfileApiController extends AbstractController
 {
     public function __construct(
         private readonly Security $security,
-        private readonly UserProfileService $profileService
+        private readonly UserProfileService $profileService,
+        private readonly UserAnonymizer $userAnonymizer
     ) {
     }
 
@@ -75,6 +77,26 @@ class ProfileApiController extends AbstractController
         $user = $this->getViewer();
 
         return $this->json($this->profileService->profileToArray($user));
+    }
+
+    /**
+     * Supprime/anonymise définitivement le compte utilisateur (RGPD).
+     */
+    #[Route('', name: 'api_profile_delete', methods: ['DELETE'])]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[OA\Delete(
+        summary: 'Supprimer mon compte (RGPD)',
+        responses: [
+            new OA\Response(response: 204, description: 'Compte anonymisé avec succès'),
+            new OA\Response(response: 401, description: 'JWT manquant ou invalide'),
+        ]
+    )]
+    public function delete(): JsonResponse
+    {
+        $user = $this->getViewer();
+        $this->userAnonymizer->anonymize($user);
+
+        return $this->json(null, Response::HTTP_NO_CONTENT);
     }
 
     /**

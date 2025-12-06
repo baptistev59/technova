@@ -27,7 +27,7 @@ class AppFixtures extends Fixture
     private const AVATAR_BASE_PATH = '/images/avatars/';
     private const ADMIN_AVATAR = self::AVATAR_BASE_PATH . 'avatar-admin.svg';
     private const VENDOR_AVATAR = self::AVATAR_BASE_PATH . 'avatar-vendor.svg';
-    private const CUSTOMER_AVATAR = self::AVATAR_BASE_PATH . 'avatar-vendor.svg';
+    private const CUSTOMER_AVATAR = self::AVATAR_BASE_PATH . 'avatar-customer.svg';
 
     public function __construct(
         private SluggerInterface $slugger,

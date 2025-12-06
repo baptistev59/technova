@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmation commande {{ order.reference }}</title>
+    <style>
+        body { font-family: 'Inter', Arial, sans-serif; color:#0f1924; background:#f5f6fa; margin:0; padding:24px; }
+        .card { background:#ffffff; border-radius:24px; padding:24px; margin-bottom:18px; box-shadow:0 20px 40px rgba(15,25,36,0.08); }
+        .items { border-collapse: collapse; width:100%; }
+        .items th { text-align:left; font-size:12px; text-transform:uppercase; letter-spacing:0.15em; color:#5c6c7c; padding-bottom:8px; }
+        .items td { padding:12px 0; border-top:1px solid #eef1f4; vertical-align:middle; }
+        .items img { width:48px; height:48px; border-radius:12px; object-fit:cover; display:block; }
+        .cta { display:inline-block; border-radius:999px; background:#2563eb; color:#fff; text-decoration:none; padding:12px 28px; font-weight:600; }
+        small { color:#5c6c7c; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <p style="text-transform:uppercase; letter-spacing:0.25em; font-size:12px; color:#8ca0b3; margin:0;">Technova</p>
+        <h1 style="margin:8px 0 16px;">Merci pour ta commande 🎉</h1>
+        <p style="margin:0;">Référence <strong>{{ order.reference }}</strong></p>
+    </div>
+
+    <div class="card">
+        <table class="items">
+            <thead>
+                <tr>
+                    <th>Produit</th>
+                    <th>Quantité</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                    <tr>
+                        <td>
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                {% set imageSrc = item.imageCid ?: item.imageUrl %}
+                                {% if imageSrc %}
+                                    <img src="{{ imageSrc }}" alt="{{ item.name }}">
+                                {% endif %}
+                                <div>
+                                    <strong>{{ item.name }}</strong><br>
+                                    <small>{{ item.unitPrice|number_format(2, ',', ' ') }} € / unité</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ item.quantity }}</td>
+                        <td><strong>{{ item.lineTotal|number_format(2, ',', ' ') }} €</strong></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p style="text-align:right; font-size:20px; margin-top:16px;">Total payé : <strong>{{ total|number_format(2, ',', ' ') }} €</strong></p>
+    </div>
+
+    <div class="card">
+        <h2 style="margin-top:0;">Adresse de livraison</h2>
+        <p style="margin:0;">
+            {{ address.addressLine1 }}<br>
+            {% if address.addressLine2 %}{{ address.addressLine2 }}<br>{% endif %}
+            {{ address.postalCode }} {{ address.city }}<br>
+            {{ address.country }}
+        </p>
+    </div>
+
+    <div class="card" style="text-align:center;">
+        <p>Tu peux suivre tes commandes depuis ton espace client.</p>
+        <a class="cta" href="{{ baseUrl ~ '/mon-compte/commandes/' ~ order.reference }}">Voir ma commande</a>
+    </div>
+
+    <p style="font-size:12px; color:#8ca0b3; text-align:center;">© {{ "now"|date("Y") }} TechNova Marketplace.</p>
+</body>
+</html>
