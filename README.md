@@ -59,7 +59,9 @@ Endpoints disponibles
 Pages Twig (catalogue)
 ----------------------
 - `/` : accueil + sections “Nouveautés” et “Produits à la une”.
-- `/catalogue` : listing avec filtres catégorie/marque/prix/texte + tri.
+- `/catalogue` : listing avec filtres catégorie/marque/prix/texte + tri (soumission automatique au changement ou via Entrée).
+- `/panier` + `/commande` : panier interactif puis checkout récapitulatif avant création de la commande + page de succès.
+- `/mon-compte/commandes` : historique de commandes + détail par référence.
 - `/produit/{slug}` : fiche produit (images, caractéristiques, options, variantes).
 - `/panier` : récapitulatif du panier stocké côté session (ajout/suppression/vidage) — accès réservé aux clients connectés.
 

@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title 'Confirmation de commande — TechNova' %}
+
+{% block body %}
+<section class="tn-section max-w-4xl mx-auto space-y-8">
+    <div class="text-center space-y-2">
+        <p class="text-xs uppercase tracking-[0.35em] text-slate-400">TechNova</p>
+        <h1 class="text-3xl font-bold">Confirmer ma commande</h1>
+        <p class="text-slate-500">Vérifie les articles et ton adresse avant de valider.</p>
+    </div>
+
+    <div class="space-y-5">
+        {% for item in cart.items %}
+            {% set product = item.product %}
+            {% set mainImage = product.images|first %}
+            <article class="rounded-[32px] border border-slate-200 bg-white/90 p-5 shadow-[0_25px_60px_rgba(15,25,36,0.06)] flex items-center gap-4">
+                <div class="h-14 w-14 rounded-full bg-slate-50 overflow-hidden flex-shrink-0">
+                    {% if mainImage %}
+                        <img src="{{ mainImage.url }}" alt="{{ product.name }}" class="h-full w-full object-cover">
+                    {% else %}
+                        <img src="{{ asset('assets/images/product-placeholder.svg') }}" alt="Visuel par défaut" class="h-full w-full object-cover">
+                    {% endif %}
+                </div>
+                <div class="flex-1">
+                    <p class="font-semibold text-slate-900">{{ product.name }}</p>
+                    <p class="text-sm text-slate-500">Quantité : {{ item.quantity }}</p>
+                    <p class="text-sm text-slate-500">Prix unitaire : {{ product.price|number_format(2, ',', ' ') }} €</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm text-slate-500">Total ligne</p>
+                    <p class="text-xl font-semibold text-slate-900">{{ item.lineTotal|number_format(2, ',', ' ') }} €</p>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+
+    <div class="rounded-[32px] border border-slate-200 bg-white/90 p-6 space-y-3">
+        <h2 class="text-lg font-semibold text-slate-900">Adresse de livraison</h2>
+        <p class="text-sm text-slate-600 leading-relaxed">
+            {{ viewer.firstname }} {{ viewer.lastname }}<br>
+            {{ address.addressLine1 }}<br>
+            {% if address.addressLine2 %}{{ address.addressLine2 }}<br>{% endif %}
+            {{ address.postalCode }} {{ address.city }}<br>
+            {{ address.country }}
+        </p>
+        <p class="text-xs text-slate-500">Besoin de modifier ? Mets à jour <a class="text-blue-600 underline" href="{{ path('app_profile') }}">ton profil</a>.</p>
+    </div>
+
+    <div class="rounded-[32px] border border-blue-200 bg-blue-50/80 p-6 shadow-[0_35px_90px_rgba(76,125,240,0.18)] space-y-4">
+        <div class="flex justify-between text-sm text-slate-600">
+            <span>Total articles</span>
+            <span>{{ cart.totalQuantity }}</span>
+        </div>
+        <div class="flex justify-between text-2xl font-semibold text-slate-900">
+            <span>Total</span>
+            <span>{{ cart.total|number_format(2, ',', ' ') }} €</span>
+        </div>
+        <form class="space-y-3" method="post" action="{{ path('app_checkout_confirm') }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('checkout_confirm') }}">
+            <button class="btn btn-primary w-full py-3" type="submit">Confirmer la commande</button>
+            <a class="btn btn-outline w-full" href="{{ path('app_cart_show') }}">Retour au panier</a>
+        </form>
+    </div>
+</section>
+{% endblock %}

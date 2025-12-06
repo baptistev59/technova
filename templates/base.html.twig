@@ -25,7 +25,16 @@
             </nav>
             <div class="tn-actions">
                 <div class="tn-search max-w-xs w-full">
-                    <input type="text" placeholder="Rechercher un produit…">
+                    <form class="tn-search__form" method="get" action="{{ path('catalog_index') }}">
+                        <input
+                            type="search"
+                            name="search"
+                            placeholder="Rechercher un produit…"
+                            value="{{ app.request.get('search') }}"
+                            minlength="2"
+                            required
+                        >
+                    </form>
                 </div>
                 <div class="tn-auth">
                 {% if viewer %}
@@ -48,6 +57,7 @@
                         </summary>
                         <div class="tn-user-menu__panel">
                             <a class="tn-user-menu__item" href="{{ path('app_profile') }}">Mon profil</a>
+                            <a class="tn-user-menu__item" href="{{ path('app_account_orders') }}">Mes commandes</a>
                             <a class="tn-user-menu__item" href="{{ path('app_cart_show') }}">Mon panier</a>
                             <form method="post" action="{{ path('app_logout_web') }}">
                                 <input type="hidden" name="_token" value="{{ csrf_token('logout_web') }}">

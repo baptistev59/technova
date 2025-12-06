@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title 'Commande ' ~ order.reference %}
+
+{% block body %}
+<section class="tn-section max-w-4xl mx-auto space-y-6">
+    <div class="rounded-3xl border border-slate-200 bg-white p-6">
+        <div class="flex flex-wrap justify-between gap-4">
+            <div>
+                <p class="text-sm text-slate-500">Référence</p>
+                <h1 class="text-2xl font-bold text-slate-900">{{ order.reference }}</h1>
+            </div>
+            <div class="text-right">
+                <p class="text-sm text-slate-500">Statut</p>
+                <p class="text-lg font-semibold text-slate-900">{{ order.status|capitalize }}</p>
+                <p class="text-xs text-slate-500 mt-1">Créée le {{ order.createdAt|date('d/m/Y à H\\hi') }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="rounded-3xl border border-slate-200 bg-white p-6 space-y-4">
+        <h2 class="text-lg font-semibold text-slate-900">Articles</h2>
+        <div class="space-y-4">
+            {% for item in order.items %}
+                <div class="flex items-center gap-4 rounded-2xl border border-slate-100 p-4">
+                    <div class="h-16 w-16 rounded-2xl bg-slate-50 overflow-hidden flex items-center justify-center">
+                        {% if item.productImage %}
+                            {% set imageUrl = item.productImage starts with 'http' ? item.productImage : asset(item.productImage) %}
+                            <img src="{{ imageUrl }}" alt="{{ item.productName }}" class="h-full w-full object-cover">
+                        {% else %}
+                            <span class="text-xs text-slate-400">image</span>
+                        {% endif %}
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-medium text-slate-900">{{ item.productName }}</p>
+                        <p class="text-sm text-slate-500">Quantité : {{ item.quantity }}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm text-slate-500">{{ item.unitPrice|number_format(2, ',', ' ') }} € / unité</p>
+                        <p class="text-lg font-semibold text-slate-900">{{ item.lineTotal|number_format(2, ',', ' ') }} €</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="flex items-center justify-between border-t border-slate-100 pt-4">
+            <span class="text-xl font-semibold text-slate-900">Total</span>
+            <span class="text-2xl font-bold text-slate-900">{{ order.totalAmount|number_format(2, ',', ' ') }} €</span>
+        </div>
+    </div>
+
+    <div class="rounded-3xl border border-slate-200 bg-white p-6">
+        <h2 class="text-lg font-semibold text-slate-900">Adresse de livraison</h2>
+        {% set address = order.shippingAddress %}
+        <p class="mt-2 text-sm text-slate-600">
+            {{ address.addressLine1 }}<br>
+            {% if address.addressLine2 %}{{ address.addressLine2 }}<br>{% endif %}
+            {{ address.postalCode }} {{ address.city }}<br>
+            {{ address.country }}
+        </p>
+    </div>
+
+    <div class="flex flex-wrap gap-3">
+        <a class="btn btn-outline" href="{{ path('app_account_orders') }}">Retour aux commandes</a>
+        <a class="btn btn-primary" href="{{ path('catalog_index') }}">Continuer mes achats</a>
+    </div>
+</section>
+{% endblock %}

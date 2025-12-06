@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Address;
 use App\Entity\Brand;
 use App\Entity\Category;
 use App\Entity\Product;
@@ -67,9 +68,27 @@ class AppFixtures extends Fixture
     private function createDemoCustomers(ObjectManager $manager): void
     {
         $customers = [
-            ['email' => 'lena.client@technova.test', 'firstname' => 'Lena', 'lastname' => 'Hamon', 'password' => 'Client#01'],
-            ['email' => 'maxime.client@technova.test', 'firstname' => 'Maxime', 'lastname' => 'Dubois', 'password' => 'Client#02'],
-            ['email' => 'nora.client@technova.test', 'firstname' => 'Nora', 'lastname' => 'Keller', 'password' => 'Client#03'],
+            [
+                'email' => 'lena.client@technova.test',
+                'firstname' => 'Lena',
+                'lastname' => 'Hamon',
+                'password' => 'Client#01',
+                'address' => ['line1' => '12 avenue des Fleurs', 'line2' => null, 'postal' => '75002', 'city' => 'Paris', 'country' => 'FR'],
+            ],
+            [
+                'email' => 'maxime.client@technova.test',
+                'firstname' => 'Maxime',
+                'lastname' => 'Dubois',
+                'password' => 'Client#02',
+                'address' => ['line1' => '8 rue des Peupliers', 'line2' => 'Bâtiment B', 'postal' => '69003', 'city' => 'Lyon', 'country' => 'FR'],
+            ],
+            [
+                'email' => 'nora.client@technova.test',
+                'firstname' => 'Nora',
+                'lastname' => 'Keller',
+                'password' => 'Client#03',
+                'address' => ['line1' => '5 boulevard du Parc', 'line2' => null, 'postal' => '13008', 'city' => 'Marseille', 'country' => 'FR'],
+            ],
         ];
 
         foreach ($customers as $data) {
@@ -82,7 +101,22 @@ class AppFixtures extends Fixture
 
             $customer->setPassword($this->passwordHasher->hashPassword($customer, $data['password']));
 
+             $address = (new Address())
+                 ->setLabel('Adresse principale')
+                 ->setAddressLine1($data['address']['line1'])
+                 ->setAddressLine2($data['address']['line2'])
+                 ->setPostalCode($data['address']['postal'])
+                 ->setCity($data['address']['city'])
+                 ->setCountry($data['address']['country'])
+                 ->setIsDefault(true)
+                 ->setIsShipping(true)
+                 ->setIsBilling(true)
+                 ->setOwner($customer);
+
+             $customer->addAddress($address);
+
             $manager->persist($customer);
+            $manager->persist($address);
         }
     }
 

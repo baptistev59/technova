@@ -73,6 +73,7 @@ class ProductRepository extends ServiceEntityRepository
             ->andWhere('p.isPublished = :published')
             ->setParameter('published', true)
             ->orderBy('p.createdAt', 'DESC');
+        $hasSearchOrdering = false;
 
         if (!empty($filters['category'])) {
             $qb->andWhere('c.slug = :category')
@@ -95,16 +96,39 @@ class ProductRepository extends ServiceEntityRepository
         }
 
         if (!empty($filters['search'])) {
-            $qb->andWhere('p.name LIKE :term OR p.shortDescription LIKE :term')
-                ->setParameter('term', '%' . $filters['search'] . '%');
+            $normalized = mb_strtolower(trim(preg_replace('/\s+/', ' ', (string) $filters['search'])));
+            if ($normalized !== '') {
+                $terms = array_values(array_filter(explode(' ', $normalized)));
+                if ($terms !== []) {
+                    $orExpressions = [];
+                    $scoreParts = [];
+
+                    foreach ($terms as $index => $term) {
+                        $param = 'term_' . $index;
+                        $condition = sprintf(
+                            '(LOWER(p.name) LIKE :%1$s OR LOWER(p.shortDescription) LIKE :%1$s)',
+                            $param
+                        );
+                        $orExpressions[] = $condition;
+                        $scoreParts[] = sprintf('CASE WHEN %s THEN 1 ELSE 0 END', $condition);
+                        $qb->setParameter($param, '%' . $term . '%');
+                    }
+
+                    $qb->andWhere(implode(' OR ', $orExpressions));
+                    $qb->addSelect('(' . implode(' + ', $scoreParts) . ') AS HIDDEN relevance');
+                    $qb->addOrderBy('relevance', 'DESC');
+                    $hasSearchOrdering = true;
+                }
+            }
         }
 
         $sort = $filters['sort'] ?? 'newest';
+        $orderMethod = $hasSearchOrdering ? 'addOrderBy' : 'orderBy';
         match ($sort) {
-            'price_asc' => $qb->orderBy('p.price', 'ASC'),
-            'price_desc' => $qb->orderBy('p.price', 'DESC'),
-            'oldest' => $qb->orderBy('p.createdAt', 'ASC'),
-            default => $qb->orderBy('p.createdAt', 'DESC'),
+            'price_asc' => $qb->{$orderMethod}('p.price', 'ASC'),
+            'price_desc' => $qb->{$orderMethod}('p.price', 'DESC'),
+            'oldest' => $qb->{$orderMethod}('p.createdAt', 'ASC'),
+            default => $qb->{$orderMethod}('p.createdAt', 'DESC'),
         };
 
         return $qb->getQuery()->getResult();

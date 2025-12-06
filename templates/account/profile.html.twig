@@ -32,22 +32,24 @@
                         {{ form_row(profileForm.lastname) }}
                     </div>
                     <div class="grid gap-6 md:grid-cols-[auto,1fr] items-center">
-                        <div class="flex items-center justify-center">
+                        <button type="button" class="group flex items-center justify-center cursor-pointer focus:outline-none" data-avatar-trigger aria-label="Choisir un nouvel avatar">
                             {% set avatarUrl = null %}
                             {% if viewer is defined and viewer and viewer.avatarPath %}
                                 {% set avatarUrl = viewer.avatarPath starts with 'http' ? viewer.avatarPath : asset(viewer.avatarPath) %}
                             {% endif %}
-                            <div class="h-20 w-20 rounded-full bg-white border border-slate-200 shadow-inner overflow-hidden flex items-center justify-center" data-avatar-preview>
+                            <div class="relative h-20 w-20 rounded-full bg-white border border-slate-200 shadow-inner overflow-hidden transition hover:shadow-md" data-avatar-preview>
                                 {% if avatarUrl %}
-                                    <img src="{{ avatarUrl }}" alt="Avatar actuel" class="h-full w-full object-cover">
+                                    <img src="{{ avatarUrl }}" alt="Avatar actuel" class="absolute inset-0 h-full w-full object-cover object-center">
                                 {% else %}
                                     <span class="text-slate-400 text-lg font-semibold">Avatar</span>
                                 {% endif %}
+                                <div class="pointer-events-none absolute inset-0 bg-slate-900/40 text-white text-xs font-semibold uppercase tracking-wide flex items-center justify-center opacity-0 transition group-hover:opacity-100">Changer</div>
                             </div>
-                        </div>
+                        </button>
                         <div>
-                            {{ form_row(profileForm.avatarFile) }}
-                            <p class="text-xs text-slate-500 mt-1">Format PNG ou JPG - 2 Mo max.</p>
+                            {{ form_widget(profileForm.avatarFile, {'attr': {'class': 'sr-only', 'data-avatar-input': 'true'}}) }}
+                            <p class="text-xs text-slate-500 mt-1">Clique sur l’avatar pour choisir un nouveau fichier (PNG/JPG, 2 Mo max).</p>
+                            {{ form_errors(profileForm.avatarFile) }}
                         </div>
                     </div>
                     <div class="grid gap-4 md:grid-cols-2">
@@ -143,23 +145,37 @@
     {{ parent() }}
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const fileInput = document.querySelector('input[type="file"][name$="[avatarFile]"]');
+            const fileInput = document.querySelector('[data-avatar-input]');
             const preview = document.querySelector('[data-avatar-preview]');
+            const trigger = document.querySelector('[data-avatar-trigger]');
 
-            if (!fileInput || !preview) {
+            if (!fileInput || !preview || !trigger) {
                 return;
             }
+
+            const previewImage = dataUrl => {
+                preview.innerHTML = '<img src="' + dataUrl + '" alt="Nouvel avatar" class="absolute inset-0 h-full w-full object-cover object-center">';
+                const overlay = document.createElement('div');
+                overlay.className = 'pointer-events-none absolute inset-0 bg-slate-900/40 text-white text-xs font-semibold uppercase tracking-wide flex items-center justify-center opacity-0 transition group-hover:opacity-100';
+                overlay.textContent = 'Changer';
+                preview.appendChild(overlay);
+            };
+
+            trigger.addEventListener('click', () => fileInput.click());
+            trigger.addEventListener('keydown', event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    fileInput.click();
+                }
+            });
 
             fileInput.addEventListener('change', () => {
                 const [file] = fileInput.files ?? [];
                 if (!file) {
                     return;
                 }
-
                 const reader = new FileReader();
-                reader.onload = event => {
-                    preview.innerHTML = '<img src="' + event.target.result + '" alt="Nouvel avatar" class="h-full w-full object-cover">';
-                };
+                reader.onload = event => previewImage(event.target.result);
                 reader.readAsDataURL(file);
             });
         });

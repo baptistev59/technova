@@ -19,10 +19,22 @@
                 <div class="grid grid-cols-1 divide-y divide-slate-100">
                     {% for item in cart.items %}
                         {% set product = item.product %}
+                        {% set mainImage = product.images|first %}
                         <div class="flex flex-col gap-4 p-6 md:flex-row md:items-center" data-cart-line data-product-id="{{ product.id }}">
-                            <div class="flex-1">
-                                <h3 class="text-lg font-semibold text-slate-900">{{ product.name }}</h3>
-                                <p class="text-sm text-slate-500">Prix unitaire : {{ product.price|number_format(2, ',', ' ') }} €</p>
+                            <div class="flex items-center gap-4 flex-1">
+                                <div class="h-20 w-20 rounded-2xl bg-slate-50 overflow-hidden">
+                                    {% if mainImage %}
+                                        <img src="{{ mainImage.url }}" alt="{{ product.name }}" class="h-full w-full object-cover">
+                                    {% else %}
+                                        <img src="{{ asset('assets/images/product-placeholder.svg') }}" alt="Visuel par défaut" class="h-full w-full object-cover">
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-slate-900">{{ product.name }}</h3>
+                                    <p class="text-sm text-slate-500">Prix unitaire : {{ product.price|number_format(2, ',', ' ') }} €</p>
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-2 md:items-end">
                                 <form class="mt-3 flex items-center gap-2 cart-update-form" method="post" action="{{ path('app_cart_update', {id: product.id}) }}">
                                     <label class="text-sm text-slate-600" for="quantity-{{ product.id }}">Quantité</label>
                                     <input
@@ -38,7 +50,6 @@
                                     <input type="hidden" name="_token" value="{{ csrf_token('update_cart_' ~ product.id) }}">
                                 </form>
                             </div>
-                            <div class="flex flex-col items-end gap-2">
                                 <p class="text-xl font-semibold text-slate-900" data-line-total>{{ item.lineTotal|number_format(2, ',', ' ') }} €</p>
                                 <form method="post" action="{{ path('app_cart_remove', {id: product.id}) }}">
                                     <input type="hidden" name="_token" value="{{ csrf_token('remove_from_cart_' ~ product.id) }}">
@@ -61,7 +72,7 @@
                         <input type="hidden" name="_token" value="{{ csrf_token('cart_clear') }}">
                         <button class="btn btn-outline" type="submit">Vider le panier</button>
                     </form>
-                    <a class="btn btn-primary" href="#">Passer la commande</a>
+                    <a class="btn btn-primary" href="{{ path('app_checkout_index') }}">Passer la commande</a>
                 </div>
             </div>
         {% endif %}

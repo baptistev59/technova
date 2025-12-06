@@ -10,6 +10,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use App\Entity\Address;
 use App\Entity\Traits\Timestampable;
+use App\Entity\CustomerOrder;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -69,10 +70,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: AuditLog::class)]
     private Collection $auditLogs;
 
+    /**
+     * @var Collection<int, CustomerOrder>
+     */
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: CustomerOrder::class)]
+    private Collection $orders;
+
     public function __construct()
     {
         $this->addresses = new ArrayCollection();
         $this->auditLogs = new ArrayCollection();
+        $this->orders = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -282,6 +290,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($auditLog->getOwner() === $this) {
                 $auditLog->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CustomerOrder>
+     */
+    public function getOrders(): Collection
+    {
+        return $this->orders;
+    }
+
+    public function addOrder(CustomerOrder $order): self
+    {
+        if (!$this->orders->contains($order)) {
+            $this->orders->add($order);
+            $order->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrder(CustomerOrder $order): self
+    {
+        if ($this->orders->removeElement($order)) {
+            if ($order->getOwner() === $this) {
+                $order->setOwner(null);
             }
         }
 
